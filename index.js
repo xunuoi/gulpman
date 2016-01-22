@@ -557,7 +557,7 @@ function setRevPlace(){
 gulp.task('c-css', ()=>{
     // 除去lib
     return gulp.src([css_source, except_lib_source])
-    .pipe(p.minifyCss())
+    .pipe(p.cssnano())
     .pipe(gulp.dest(DIST_STATIC_PATH))
 })
 
@@ -622,7 +622,7 @@ gulp.task('c-rev-copy-lib', ()=>{
 // minify the lib css
 gulp.task('c-lib-mincss', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.css'))
-    .pipe(p.minifyCss())
+    .pipe(p.cssnano())
     .pipe(gulp.dest(dist_lib_path))
 })
 

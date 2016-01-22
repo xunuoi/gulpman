@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Create Modular Front-End Build System, based on gulp ,easy useage",
   "main": "index.js",
   "scripts": {
@@ -13,11 +13,12 @@
   "keywords": [
     "gulp",
     "modular",
-    "front-end",
+    "scss",
+    "es6",
     "build",
     "easy",
-	"fis",
-	"component"
+	  "fis",
+	  "component"
   ],
   "author": "Lucas X",
   "license": "MIT",
@@ -35,7 +36,7 @@
     "gulp-imagemin": "^2.3.0",
     "gulp-load-plugins": "^1.0.0-rc.1",
     "gulp-md5-plus": "^0.1.9",
-    "gulp-minify-css": "^1.2.0",
+    "gulp-cssnano": "^2.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev-all": "^0.8.22",
     "gulp-rev-replace": "^0.4.3",
