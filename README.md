@@ -4,7 +4,7 @@ Create Modular Front-End Build System, based on gulp ,easy useage
 
 ####In Your gulpfile:
 
-````Javascript
+```Javascript
 /**
  * Gulpfile.js
  */
@@ -43,7 +43,7 @@ gman.config({
 
 ####In Your CLI:
 
-````Shell
+```Shell
 # publish
 gulp gm:publish
 
