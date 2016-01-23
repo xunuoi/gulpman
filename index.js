@@ -23,8 +23,9 @@ let gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     es = require('event-stream'),
     globby = require('globby'),
+    through = require('through2')
 
-    cheerio = require('gulp-cheerio')
+    // cheerio = require('gulp-cheerio')
 
 
 /**
@@ -56,12 +57,13 @@ let _cwd = process.cwd()
 let cdn_prefix = '',
     ASSETS_URL_PREFIX = '/static'
 
+// the components source dir
 let COMPONENTS_PATH = './components'
-let RUNTIME_VIEWS_PATH = './views_runtime'
+
+let RUNTIME_VIEWS_PATH = './views'
 let DIST_VIEWS_PATH = './views_dist'
 
-
-let RUNTIME_ASSETS_PATH = './assets_runtime'
+let RUNTIME_ASSETS_PATH = './assets'
 let DIST_ASSETS_PATH = './assets_dist'
 
 
@@ -82,7 +84,8 @@ let base_source_type = 'js,css',
     // the pure raw souce means the source do not need gulp deal!
     pure_source_type = [font_source_type, other_source_type ].join(),
     // all raw source
-    all_raw_source_type = [base_source_type, img_source_type, font_source_type, other_source_type].join()
+    all_raw_source_type = [base_source_type, img_source_type, font_source_type, other_source_type].join(),
+    type_pt_str = all_raw_source_type.split(',').join('|')
 
 
 // uncompiled source =====================================
@@ -113,8 +116,44 @@ let js_source = j(RUNTIME_STATIC_PATH, '**/*.js'),
 let dist_html_source = j(DIST_VIEWS_PATH, '**/*.html'),
     dist_css_source = j(DIST_STATIC_PATH, '**/*.css'),
     dist_all_raw_source = j(DIST_ASSETS_PATH, '**/*.{'+all_raw_source_type+'}')
-    // dist_all_raw_source = j(DIST_STATIC_PATH, '**/*.{'+all_raw_source_type+'}')
 
+
+function resetVars(){
+
+    DIST_STATIC_PATH = j(DIST_ASSETS_PATH, ASSETS_URL_PREFIX),
+
+    RUNTIME_STATIC_PATH = j(RUNTIME_ASSETS_PATH, ASSETS_URL_PREFIX),
+
+    RUNTIME_STATIC_TMP_PATH = j(RUNTIME_ASSETS_PATH, '.tmp_raw_static'),
+
+    // the pure raw souce means the source do not need gulp deal!
+    pure_source_type = [font_source_type, other_source_type ].join(),
+    // all raw source
+    all_raw_source_type = [base_source_type, img_source_type, font_source_type, other_source_type].join(),
+    type_pt_str = all_raw_source_type.split(',').join('|'),
+
+    sass_source = j(COMPONENTS_PATH, '**/*.{scss,sass}'),
+    es6_source = j(COMPONENTS_PATH, '**/*.{es6,jsx}'),
+
+    all_raw_source = j(COMPONENTS_PATH, '**/*.{'+all_raw_source_type+'}'),
+
+    html_source = [j(COMPONENTS_PATH,'**/*.html'), '!'+j(COMPONENTS_PATH, lib_dir, '**/*.html')],
+
+    js_source = j(RUNTIME_STATIC_PATH, '**/*.js'),
+
+    lib_source = j(RUNTIME_STATIC_PATH, lib_dir, '**/*.*'),
+    except_lib_source = '!'+lib_source,
+
+    dist_lib_path = j(DIST_STATIC_PATH, lib_dir),
+    css_source = j(RUNTIME_STATIC_PATH, '**/*.css'),
+    img_source = j(RUNTIME_STATIC_PATH,'**/*.{'+img_source_type+'}'),
+    pure_source = j(RUNTIME_STATIC_PATH, '**/*.{'+pure_source_type+'}'),
+
+
+    dist_html_source = j(DIST_VIEWS_PATH, '**/*.html'),
+    dist_css_source = j(DIST_STATIC_PATH, '**/*.css'),
+    dist_all_raw_source = j(DIST_ASSETS_PATH, '**/*.{'+all_raw_source_type+'}')
+}
 
 // COMMON UTILS FN  ========================================
 
@@ -292,16 +331,18 @@ function updateES6Compile(event){
 
 
 function parseRawHTML(b, basepath) {
-    return b.pipe(cheerio({
+    /*return b.pipe(cheerio({
+        parserOptions: {
+            // xmlMode: true
+            'decodeEntities': false
+            // 'normalizeWhitespace': false,
+        },
         run: function ($, file, done) {
             // file.relative 是根据path.base自动生成的
             if(basepath) file.base = basepath
 
             let fdirname = path.dirname(file.relative)
 
-            // console.log('fdir: '+fdirname)
-            // console.log('cwd: '+file.cwd)
-            // console.log('base: '+file.base)
             
             $('script, link, img').each((i, e)=>{
                 let $e = $(e),
@@ -322,6 +363,49 @@ function parseRawHTML(b, basepath) {
     }))
     .on('error', err=>{
         OSInformError('Cheerio Error', err)
+    })*/
+    return b.pipe(through.obj(function (file, enc, cb){
+
+        if (file.isNull()) {
+            this.push(file);
+            return cb()
+        }
+        if (file.isStream()) {
+            console.log('ParseHtml Error: Streaming not supported')
+            return cb()
+        }
+
+        let contents = file.contents.toString()
+
+        // let pt1 = /(?:['"]?)([\w\.\-\?\-\/]+?(\.(css|js|tpl|jpg|JPG|png|PNG|gif|GIF|jpeg|JPEG|svg|SVG|ttf|woff|eot)))(?:['"]?)/gm
+        console.log('*Raw HTML File Parsed: '+file.relative)
+
+        let src_pt = new RegExp('(?:[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?:[\'"]?)', 'gm')
+
+        let tmp_rs_list = contents.match(src_pt), rs_list = null
+
+        tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
+
+        // file.relative 是根据path.base自动生成的
+        if(basepath) file.base = basepath
+
+        let fdirname = path.dirname(file.relative)
+
+        rs_list && rs_list.forEach(e=>{
+            // console.log(e)
+            let epath = e.slice(1, -1)
+
+            contents = contents.replace(e, '"'+j(ASSETS_URL_PREFIX, fdirname, epath)+'"')
+        })
+
+
+        file.contents = new Buffer(contents)
+        this.push(file)
+        cb()
+
+    }))
+    .on('error', err=>{
+        OSInformError('ParseHtml Error', err)
     })
     .pipe(gulp.dest(RUNTIME_VIEWS_PATH))
 }
@@ -408,6 +492,12 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 
 
 gulp.task('gm:develop', ['gm:compile'],()=>{
+    
+    //debug...
+    // return;
+
+    console.log('\n*Source Compiled Succeed. \nPrepare for watching, please wait ...\n')
+
 
     // watch es6\js
     let js_watcher = gulp.watch(es6_source)
@@ -453,6 +543,7 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
 
     })
 
+
     // watch html
     let html_watcher = gulp.watch(html_source)
 
@@ -489,6 +580,8 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
         }
     
     })
+
+
     // raw source
     let raw_watcher = gulp.watch(all_raw_source)
 
@@ -534,7 +627,10 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
           console.log('Other Event: ', event)
         }
     })
-      
+
+
+    console.log('\n*Now Watching For Development:\n')
+     
 })
 
 
@@ -740,6 +836,8 @@ exports['config'] = function(opts){
 
     // global module
     opts['global'] && (global_module = opts['global_module'])
+
+    resetVars()
 
 }
 

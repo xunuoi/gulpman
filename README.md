@@ -15,6 +15,29 @@ var gulp = require('gulp'),
 
 
 // your other tasks ...
+// xxx ...yyy
+
+
+// if you want to set the dir, you can use config API:
+
+gman.config({
+    'components': 'components',
+
+    'runtime_views': 'views',
+    'dist_views': 'views_dist',
+
+    'runtime_assets': 'assets',
+    'dist_assets': 'assets_dist',
+
+    'lib': 'lib', // the js library dir, set as a global module. Also you can set as bower_components
+
+    'global': 'common' // the global module dir,
+
+    'cdn_prefix': '', // cdn prefix,
+
+    'url_prefix': '/static' // usually set as /static, this involves the server config ,such as the static path of nginx
+})
+
 
 ```
 
