@@ -41,6 +41,7 @@
     "event-stream": "^3.3.2",
     "globby": "^2.1.0",
     "gulp-babel": "^5.3.0",
+	"gulp-cheerio": "^0.6.2",
     "gulp-imagemin": "^2.3.0",
     "gulp-load-plugins": "^1.0.0-rc.1",
     "gulp-md5-plus": "^0.1.9",
