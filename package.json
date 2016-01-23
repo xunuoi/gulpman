@@ -1,14 +1,13 @@
 {
   "name": "gulpman",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Create Modular Front-End Build System, based on gulp ,easy useage",
   "engines": {
     "node": ">=4.2.0"
   },
   "main": "index.js",
   "scripts": {
-    "preinstall": "sh preinstall.sh",
-    "install": "sh install.sh",
+    "install": "sh scripts/install.sh",
     "test": "make test"
   },
   "repository": {
