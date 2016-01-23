@@ -1,13 +1,13 @@
 {
   "name": "gulpman",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Create Modular Front-End Build System, based on gulp ,easy useage",
   "engines": {
     "node": ">=4.2.0"
   },
   "main": "index.js",
   "scripts": {
-    "install": "sh scripts/install.sh",
+    "postinstall": "sh scripts/install.sh",
     "test": "make test"
   },
   "repository": {
@@ -17,6 +17,7 @@
   "keywords": [
     "gulp",
     "modular",
+    "gulpman",
     "scss",
     "es6",
     "build",
@@ -42,10 +43,9 @@
     "event-stream": "^3.3.2",
     "globby": "^2.1.0",
     "gulp-babel": "^5.3.0",
-	"gulp-cheerio": "^0.6.2",
+	  "gulp-cheerio": "^0.6.2",
     "gulp-imagemin": "^2.3.0",
     "gulp-load-plugins": "^1.0.0-rc.1",
-    "gulp-md5-plus": "^0.1.9",
     "gulp-cssnano": "^2.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev-all": "^0.8.22",

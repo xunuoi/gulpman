@@ -53,16 +53,16 @@ let gulp = require('gulp'),
 // define base vars ========================================
 let _cwd = process.cwd()
 
-let cdn_prefix = 'http://s1.karat.cc',
+let cdn_prefix = '',
     ASSETS_URL_PREFIX = '/static'
 
-let COMPONENTS_PATH = '../components'
-let RUNTIME_VIEWS_PATH = '../views_runtime'
-let DIST_VIEWS_PATH = '../views_dist'
+let COMPONENTS_PATH = './components'
+let RUNTIME_VIEWS_PATH = './views_runtime'
+let DIST_VIEWS_PATH = './views_dist'
 
 
-let RUNTIME_ASSETS_PATH = '../assets_runtime'
-let DIST_ASSETS_PATH = '../assets_dist'
+let RUNTIME_ASSETS_PATH = './assets_runtime'
+let DIST_ASSETS_PATH = './assets_dist'
 
 
 let DIST_STATIC_PATH = j(DIST_ASSETS_PATH, ASSETS_URL_PREFIX)
@@ -202,7 +202,7 @@ function do_browserify(){
 
 // Main Tasks =====================================
 
-gulp.task('clean', ()=>{
+gulp.task('gm:clean', ()=>{
     sh.rm('-rf', [
 
         RUNTIME_VIEWS_PATH,
@@ -215,7 +215,7 @@ gulp.task('clean', ()=>{
 })
 
 
-gulp.task('compile-copy', ()=>{
+gulp.task('gm:compile-copy', ()=>{
     return gulp.src(all_raw_source)
     .pipe(gulp.dest(RUNTIME_STATIC_PATH))
     // 复制一份 非编译到static备份目录
@@ -223,7 +223,7 @@ gulp.task('compile-copy', ()=>{
 })
 
 
-gulp.task('compile-sass', ()=>{
+gulp.task('gm:compile-sass', ()=>{
     
     return gulp.src(sass_source)
     .pipe(p.sass())
@@ -236,7 +236,7 @@ gulp.task('compile-sass', ()=>{
 })
 
 
-gulp.task('compile-es6', ()=>{
+gulp.task('gm:compile-es6', ()=>{
 
     return gulp.src(es6_source)
     .pipe(p.babel())
@@ -251,7 +251,7 @@ gulp.task('compile-es6', ()=>{
 })
 
 
-gulp.task('compile-browserify', ['compile-es6'], ()=>{
+gulp.task('gm:compile-browserify', ['gm:compile-es6'], ()=>{
     return do_browserify()
 })
 
@@ -261,10 +261,10 @@ gulp.task('compile_html', cb=>{
 })
 
 
-gulp.task('compile', p.sequence(
-    'clean', 
-    'compile-copy',
-    ['compile-sass', 'compile-browserify'],
+gulp.task('gm:compile', p.sequence(
+    'gm:clean', 
+    'gm:compile-copy',
+    ['gm:compile-sass', 'gm:compile-browserify'],
     'compile_html'
 ))
 
@@ -407,7 +407,7 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 })
 
 
-gulp.task('develop', ['compile'],()=>{
+gulp.task('gm:develop', ['gm:compile'],()=>{
 
     // watch es6\js
     let js_watcher = gulp.watch(es6_source)
@@ -435,7 +435,7 @@ gulp.task('develop', ['compile'],()=>{
 
 
     // watch scss
-    let css_watcher = gulp.watch(sass_source, ['compile-sass'])
+    let css_watcher = gulp.watch(sass_source, ['gm:compile-sass'])
 
     css_watcher.on('change', event=>{
       // console.log(event)
@@ -554,7 +554,7 @@ function setRevPlace(){
 
 // tasks
 
-gulp.task('c-css', ()=>{
+gulp.task('gm:css', ()=>{
     // 除去lib
     return gulp.src([css_source, except_lib_source])
     .pipe(p.cssnano())
@@ -562,7 +562,7 @@ gulp.task('c-css', ()=>{
 })
 
 
-gulp.task('c-imagemin', ()=>{
+gulp.task('gm:imagemin', ()=>{
     // 除去lib
     return gulp.src([img_source, except_lib_source])
     .pipe(p.imagemin({
@@ -577,7 +577,7 @@ gulp.task('c-imagemin', ()=>{
 })
 
 
-gulp.task('c-js', ()=>{
+gulp.task('gm:js', ()=>{
     // 除去lib
     return gulp.src([js_source, except_lib_source])
     .pipe(p.uglify())
@@ -598,10 +598,10 @@ gulp.task('c-js', ()=>{
  * =================================
  */
 
-gulp.task('c-rev', p.sequence(
-    'c-rev-lib-pre',
-    'c-rev-source', 
-    ['c-rev-html', 'c-rev-css'])
+gulp.task('gm:rev', p.sequence(
+    'gm:rev-lib-pre',
+    'gm:rev-source', 
+    ['gm:rev-html', 'gm:rev-css'])
 )
 
 
@@ -611,23 +611,23 @@ gulp.task('c-rev', p.sequence(
  */
 
 // for the lib prepare 
-gulp.task('c-rev-lib-pre', p.sequence('c-rev-copy-lib', ['c-lib-mincss', 'c-lib-uglify']))
+gulp.task('gm:rev-lib-pre', p.sequence('gm:rev-copy-lib', ['gm:lib-mincss', 'gm:lib-uglify']))
 
 // copy lib source to dist lib dir
-gulp.task('c-rev-copy-lib', ()=>{
+gulp.task('gm:rev-copy-lib', ()=>{
     return gulp.src(lib_source)
     .pipe(gulp.dest(dist_lib_path))
 })
 
 // minify the lib css
-gulp.task('c-lib-mincss', ()=>{
+gulp.task('gm:lib-mincss', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.css'))
     .pipe(p.cssnano())
     .pipe(gulp.dest(dist_lib_path))
 })
 
 // minify the lib js
-gulp.task('c-lib-uglify', ()=>{
+gulp.task('gm:lib-uglify', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.js'))
     // uglify libjs常会导致错误
     // .pipe(p.uglify())
@@ -639,7 +639,7 @@ gulp.task('c-lib-uglify', ()=>{
 /**
  * 将dist目录的所有编译后资源，包括css,js,img,font等，做md5
  */
-gulp.task('c-rev-source', ()=>{
+gulp.task('gm:rev-source', ()=>{
 
     let revAll = new p.revAll({   
         // 禁止参与重命名的文件  
@@ -665,14 +665,14 @@ gulp.task('c-rev-source', ()=>{
 })
 
 
-gulp.task('c-rev-html', ()=>{
+gulp.task('gm:rev-html', ()=>{
     return gulp.src(dist_html_source)
     .pipe(setRevPlace())
     .pipe(gulp.dest(DIST_VIEWS_PATH))
 })
 
 
-gulp.task('c-rev-css', ()=>{
+gulp.task('gm:rev-css', ()=>{
     /**
      * debug
      * 这个rev插件有个bug,对于css中，以emma-wat-012.jpg这种中划线格式的图片，md5后，css中资源未被替换...
@@ -686,11 +686,11 @@ gulp.task('c-rev-css', ()=>{
 
 
 // create ../assets_dist
-gulp.task('c-create-assets-dist-dir', ()=>{
+gulp.task('gm:create-assets-dist-dir', ()=>{
     sh.mkdir(DIST_ASSETS_PATH)
 })
 
-gulp.task('c-copy-pure-source', ()=>{
+gulp.task('gm:copy-pure-source', ()=>{
 
     return gulp.src([pure_source, except_lib_source])
     /*.pipe(p.md5Plus(
@@ -701,9 +701,9 @@ gulp.task('c-copy-pure-source', ()=>{
 })
 
 // for compile publish
-gulp.task('c-copy', [
-    'c-create-assets-dist-dir', 
-    'c-copy-pure-source'
+gulp.task('gm:copy', [
+    'gm:create-assets-dist-dir', 
+    'gm:copy-pure-source'
 ],()=>{
 
     return gulp.src(j(RUNTIME_VIEWS_PATH, '**/*.*'))
@@ -712,7 +712,7 @@ gulp.task('c-copy', [
 
 
 // publish source ,based on the runtime source
-gulp.task('publish', p.sequence('compile', 'c-copy', ['c-js', 'c-css', 'c-imagemin'], 'c-rev'))
+gulp.task('gm:publish', p.sequence('gm:compile', 'gm:copy', ['gm:js', 'gm:css', 'gm:imagemin'], 'gm:rev'))
 
 
 // API ============================
@@ -742,6 +742,4 @@ exports['config'] = function(opts){
     opts['global'] && (global_module = opts['global_module'])
 
 }
-
-
 
