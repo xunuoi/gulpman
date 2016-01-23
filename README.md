@@ -1,7 +1,8 @@
 # gulpman
 Create Modular Front-End Build System, based on gulp ,easy useage
 
-In your gulpfile:
+
+####In Your gulpfile:
 
 ````Javascript
 /**
@@ -10,24 +11,27 @@ In your gulpfile:
 
 
 var gulp = require('gulp'),
-    gman = require('./index')
+    gman = require('gulpman')
 
 
+// your other tasks ...
 
-gulp.task('clean', ()=>{
-    gman.clean()
-})
+```
 
-gulp.task('publish', ()=>{
-    gman.publish()
-})
+####In Your CLI:
 
-gulp.task('compile', ()=>{
-    gman.compile()
-})
+````Shell
+# publish
+gulp gm:publish
 
-gulp.task('develop', ()=>{
-    gman.develop()
-})
+# develop and watch
+gulp gm:develop
+
+# clean
+gulp gm:clean
+
+# compile for develop,not watch
+gulp gm:compile
+
 
 ```

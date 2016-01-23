@@ -23,7 +23,7 @@ else
     npm install -g cnpm --registry=https://registry.npm.taobao.org
 fi
 
-echo "\n*Now install gulp-sass by cnpm"
+echo "\n*Now install gulp-sass by cnpm:\n"
 cnpm install gulp-sass
 
 if [ $? -eq 0 ];then
@@ -37,5 +37,5 @@ echo "\n\nGulpman Install Succeed!\nNow you can use the gulpman module in your g
 
 echo "\n\n*some features:\nmodular structure\nauto progresss\nscss\nes6\nupdate browserify\njs/css/image minify\nmd5 filename"
 
-echo "\n\n*Useful API:\n1. gulpman.publish\n2. gulpman.develop\n3. gulpman.clean\n4. gulpman.compile\n\n"
+echo "\n\n*Useful API:\n1. gulp gm:publish\n2. gulp gm:develop\n3. gulp gm:compile\n4. gulp gm:clean\n\n"
 
