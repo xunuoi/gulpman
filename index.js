@@ -202,7 +202,7 @@ function do_browserify(){
 
 // Main Tasks =====================================
 
-gulp.task('_clean', ()=>{
+gulp.task('clean', ()=>{
     sh.rm('-rf', [
 
         RUNTIME_VIEWS_PATH,
@@ -261,8 +261,8 @@ gulp.task('compile_html', cb=>{
 })
 
 
-gulp.task('_compile', p.sequence(
-    '_clean', 
+gulp.task('compile', p.sequence(
+    'clean', 
     'compile-copy',
     ['compile-sass', 'compile-browserify'],
     'compile_html'
@@ -407,7 +407,7 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 })
 
 
-gulp.task('_develop', ['_compile'],()=>{
+gulp.task('develop', ['compile'],()=>{
 
     // watch es6\js
     let js_watcher = gulp.watch(es6_source)
@@ -557,7 +557,7 @@ function setRevPlace(){
 gulp.task('c-css', ()=>{
     // 除去lib
     return gulp.src([css_source, except_lib_source])
-    .pipe(p.cssnano())
+    .pipe(p.minifyCss())
     .pipe(gulp.dest(DIST_STATIC_PATH))
 })
 
@@ -622,7 +622,7 @@ gulp.task('c-rev-copy-lib', ()=>{
 // minify the lib css
 gulp.task('c-lib-mincss', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.css'))
-    .pipe(p.cssnano())
+    .pipe(p.minifyCss())
     .pipe(gulp.dest(dist_lib_path))
 })
 
@@ -712,25 +712,10 @@ gulp.task('c-copy', [
 
 
 // publish source ,based on the runtime source
-gulp.task('_publish', p.sequence('_compile', 'c-copy', ['c-js', 'c-css', 'c-imagemin'], 'c-rev'))
+gulp.task('publish', p.sequence('compile', 'c-copy', ['c-js', 'c-css', 'c-imagemin'], 'c-rev'))
 
 
 // API ============================
-exports['publish'] = function(){
-    gulp.start('_publish')
-}
-
-exports['compile'] = function(){
-    gulp.start('_compile')
-}
-
-exports['develop'] = function(){
-    gulp.start('_develop')
-}
-
-exports['clean'] = function(){
-    gulp.start('_clean')
-}
 
 // config the dir
 exports['config'] = function(opts){
