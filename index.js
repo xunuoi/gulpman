@@ -52,10 +52,15 @@ let gulp = require('gulp'),
 
 
 // define base vars ========================================
+let isDevelop = true,
+    isAbsolutePath = true
+
 let _cwd = process.cwd()
 
 let cdn_prefix = '',
     ASSETS_URL_PREFIX = '/static'
+
+
 
 // the components source dir
 let COMPONENTS_PATH = './components'
@@ -118,7 +123,9 @@ let dist_html_source = j(DIST_VIEWS_PATH, '**/*.html'),
     dist_all_raw_source = j(DIST_ASSETS_PATH, '**/*.{'+all_raw_source_type+'}')
 
 
+// update the options 
 function resetVars(){
+
 
     DIST_STATIC_PATH = j(DIST_ASSETS_PATH, ASSETS_URL_PREFIX),
 
@@ -295,8 +302,17 @@ gulp.task('gm:compile-browserify', ['gm:compile-es6'], ()=>{
 })
 
 
-gulp.task('compile_html', cb=>{
-    return parseRawHTML(gulp.src(html_source))
+gulp.task('gm:compile-html', cb=>{
+
+    return parseRawHTML(gulp.src(html_source), null, true)
+})
+
+
+// only used for publish
+gulp.task('gm:publish-html', cb=>{
+    // the `null` is basepath
+    // the `false` is isRuntimeDir
+    return parseRawHTML(gulp.src(html_source), null, false)
 })
 
 
@@ -304,7 +320,7 @@ gulp.task('gm:compile', p.sequence(
     'gm:clean', 
     'gm:compile-copy',
     ['gm:compile-sass', 'gm:compile-browserify'],
-    'compile_html'
+    'gm:compile-html'
 ))
 
 
@@ -330,40 +346,8 @@ function updateES6Compile(event){
 
 
 
-function parseRawHTML(b, basepath) {
-    /*return b.pipe(cheerio({
-        parserOptions: {
-            // xmlMode: true
-            'decodeEntities': false
-            // 'normalizeWhitespace': false,
-        },
-        run: function ($, file, done) {
-            // file.relative 是根据path.base自动生成的
-            if(basepath) file.base = basepath
+function parseRawHTML(b, basepath, _isRuntimeDir) {
 
-            let fdirname = path.dirname(file.relative)
-
-            
-            $('script, link, img').each((i, e)=>{
-                let $e = $(e),
-                    tmp_type, tmp_url
-
-                function _inspect(type){
-                  return tmp_type = type, tmp_url = $e.attr(type)
-                }
-
-                if(_inspect('src') || _inspect('href')) $e.attr(tmp_type, j(ASSETS_URL_PREFIX, fdirname, tmp_url))
-            })
-
-            console.log('*Raw HTML File Parsed: '+file.relative)
-
-            $ = null
-            done()
-        }
-    }))
-    .on('error', err=>{
-        OSInformError('Cheerio Error', err)
-    })*/
     return b.pipe(through.obj(function (file, enc, cb){
 
         if (file.isNull()) {
@@ -375,39 +359,51 @@ function parseRawHTML(b, basepath) {
             return cb()
         }
 
+        // file.relative 是根据path.base自动生成的
+        if(basepath) file.base = basepath
+
+        let fdirname = path.dirname(file.relative)
+        
+        // set assets url prefix
+        let _urlPrefix
+
+        if(isAbsolutePath) {
+            _urlPrefix = ASSETS_URL_PREFIX
+        }else {
+            // 判断打包资源中的url路径前缀
+            let _fPath = j(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH, fdirname)
+
+            let _staticPath = _isRuntimeDir ? RUNTIME_STATIC_PATH : DIST_STATIC_PATH
+
+            _urlPrefix = path.relative(_fPath, _staticPath) 
+        }
+
+
         let contents = file.contents.toString()
 
         // let pt1 = /(?:['"]?)([\w\.\-\?\-\/]+?(\.(css|js|tpl|jpg|JPG|png|PNG|gif|GIF|jpeg|JPEG|svg|SVG|ttf|woff|eot)))(?:['"]?)/gm
-        console.log('*Raw HTML File Parsed: '+file.relative)
-
         let src_pt = new RegExp('(?:[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?:[\'"]?)', 'gm')
 
         let tmp_rs_list = contents.match(src_pt), rs_list = null
 
         tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
 
-        // file.relative 是根据path.base自动生成的
-        if(basepath) file.base = basepath
-
-        let fdirname = path.dirname(file.relative)
-
         rs_list && rs_list.forEach(e=>{
-            // console.log(e)
+            // remove '," on start and end
             let epath = e.slice(1, -1)
 
-            contents = contents.replace(e, '"'+j(ASSETS_URL_PREFIX, fdirname, epath)+'"')
+            contents = contents.replace(e, '"'+j(_urlPrefix, fdirname, epath)+'"')
         })
-
 
         file.contents = new Buffer(contents)
         this.push(file)
+        console.log('*Raw HTML File Parsed: '+file.relative)
         cb()
-
     }))
     .on('error', err=>{
         OSInformError('ParseHtml Error', err)
     })
-    .pipe(gulp.dest(RUNTIME_VIEWS_PATH))
+    .pipe(gulp.dest(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH))
 }
 
 
@@ -561,7 +557,7 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
             // console.log('Html Changed: '+rawHtmlFile)
             
             let basepath = j(_cwd, COMPONENTS_PATH)
-            parseRawHTML(gulp.src(rawHtmlFile), basepath)
+            parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
         }else if(etype == 'deleted'){
 
             delChangedFile(epath, RUNTIME_VIEWS_PATH)
@@ -789,32 +785,59 @@ gulp.task('gm:create-assets-dist-dir', ()=>{
 gulp.task('gm:copy-pure-source', ()=>{
 
     return gulp.src([pure_source, except_lib_source])
-    /*.pipe(p.md5Plus(
-        10,
-        [dist_html_source, dist_css_source]
-    ))*/
     .pipe(gulp.dest(DIST_STATIC_PATH))
 })
 
 // for compile publish
 gulp.task('gm:copy', [
     'gm:create-assets-dist-dir', 
-    'gm:copy-pure-source'
+    'gm:copy-pure-source',
+    'gm:publish-html'
 ],()=>{
-
-    return gulp.src(j(RUNTIME_VIEWS_PATH, '**/*.*'))
-    .pipe(gulp.dest(DIST_VIEWS_PATH))
+    // 从 runtime的views目录内容，拷贝到dist的views目录
+    // return gulp.src(j(RUNTIME_VIEWS_PATH, '**/*.*'))
+    // .pipe(gulp.dest(DIST_VIEWS_PATH))
 })
 
+//set Mode in Publish
+gulp.task('gm:publish-mode', ()=>{
+    isDevelop = false
+})
 
 // publish source ,based on the runtime source
-gulp.task('gm:publish', p.sequence('gm:compile', 'gm:copy', ['gm:js', 'gm:css', 'gm:imagemin'], 'gm:rev'))
+gulp.task('gm:publish', p.sequence(
+    'gm:publish-mode', 
+    'gm:compile', 
+    'gm:copy',
+    ['gm:js', 'gm:css', 'gm:imagemin'], 
+    'gm:rev'
+))
+
+
+// init dir and create some meta files
+gulp.task('gm:generate-meta', ()=>{
+
+    let meta_path = j(__dirname ,'./meta/**/*.*')
+
+    // May not useful for windows
+    sh.exec('mkdir '+COMPONENTS_PATH+' >& /dev/null')
+
+    // sh.mkdir(COMPONENTS_PATH)
+
+    return gulp.src(meta_path)
+    .pipe(gulp.dest(COMPONENTS_PATH))
+})
+
+gulp.task('gm:init', p.sequence('gm:clean' ,'gm:generate-meta', 'gm:compile'))
 
 
 // API ============================
 
 // config the dir
 exports['config'] = function(opts){
+
+    opts['is_absolute'] !== undefined && (isAbsolutePath = opts['is_absolute'])
+
 
     opts['cdn_prefix'] && (cdn_prefix =  opts['cdn_prefix'])
 

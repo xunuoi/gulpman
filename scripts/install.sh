@@ -35,7 +35,8 @@ fi
 
 echo "\n\nGulpman Install Succeed!\nNow you can use the gulpman module in your gulpfile.js'"
 
-echo "\n\n*some features:\nmodular structure\nauto progresss\nscss\nes6\nupdate browserify\njs/css/image minify\nmd5 filename"
+echo "\n\n*some features:\nmodular structure\nauto progresss\nscss\nes6\nupdate browserify\njs/css/image minify\nrev-md5"
 
-echo "\n\n*Useful API:\n1. gulp gm:publish\n2. gulp gm:develop\n3. gulp gm:compile\n4. gulp gm:clean\n\n"
+echo "\n\n*API Detail: https://github.com/xunuoi/gulpman"
+echo "\n*Any Question: \n  xunuoi@163.com\n  xwlxyjk@gmail.com"
 

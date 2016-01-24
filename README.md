@@ -2,6 +2,15 @@
 Create Modular Front-End Build System, based on gulp ,easy useage
 
 
+###Install
+cd into your project dir and install:
+
+`npm install gulpman --save-dev`
+
+
+
+###Usage
+
 ####In Your gulpfile:
 
 ```Javascript
@@ -21,6 +30,16 @@ var gulp = require('gulp'),
 // if you want to set the dir, you can use config API:
 
 gman.config({
+    // if set the assets url prefix as absolute or relative, default: true
+    'is_absolute': true,
+
+    'cdn_prefix': '', // cdn prefix,
+
+    // usually set as /static, this involves the server config ,such as the static path of nginx
+    'url_prefix': '/static' 
+
+    // set some path/dir:
+
     'components': 'components',
 
     'runtime_views': 'views',
@@ -29,13 +48,11 @@ gman.config({
     'runtime_assets': 'assets',
     'dist_assets': 'assets_dist',
 
-    'lib': 'lib', // the js library dir, set as a global module. Also you can set as bower_components
+    // the js library dir, set as a global module. Also you can set as bower_components
+    'lib': 'lib', 
 
-    'global': 'common' // the global module dir,
-
-    'cdn_prefix': '', // cdn prefix,
-
-    'url_prefix': '/static' // usually set as /static, this involves the server config ,such as the static path of nginx
+    // the global module dir
+    'global': 'common' 
 })
 
 
@@ -44,7 +61,11 @@ gman.config({
 ####In Your CLI:
 
 ```Shell
-# publish
+
+# init components dir and a html demo
+gulp gm:init
+
+# publish 
 gulp gm:publish
 
 # develop and watch
