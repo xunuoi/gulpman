@@ -1,10 +1,12 @@
 # gulpman
-Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高！会gulp就会定制自己的方案！
+- Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
+- 基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高！会gulp就会定制自己的方案！
+- 集成SCSS ES6 Browserify cssnano uglify imagmein等常用组件，做到一站式自动化解决方案，同时简单、可控，定制、修改都超简单！
 
 
 ###Introduction 说明
-支持Mac、Linux环境，Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装gulp-sass等模块。
+- 支持Mac、Linux环境下安装、使用
+- Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装gulp-sass等模块。
 
 
 ###Install 安装
@@ -18,7 +20,7 @@ cd into your project dir and install:
 
 ####In Your gulpfile:
 
-只需要require gulpman模块，就能自动加载gm:publish、gm:develop（开发监视模式）等task，使用时在命令行直接输入gulp gm:publish即可执行
+只需要require gulpman模块，就会自动加载gm:publish、gm:develop（开发监视模式）等task，使用时在命令行直接输入gulp gm:publish即可执行
 
 ```Javascript
 /**
@@ -30,8 +32,7 @@ var gulp = require('gulp'),
     gman = require('gulpman')
 
 
-// your other tasks ...
-// xxx ...yyy
+// your other tasks ...你的其他task
 
 
 // 设置路径、CDN、资源URL前缀等，API超级简单
@@ -104,7 +105,7 @@ gulp gm:compile
 
 ###Any Question
 
-如有问题，请联系我：
-xunuoi@163.com
-xwlxyjk@gmail.com
+- 如有问题，请联系我：
+- xunuoi@163.com
+- xwlxyjk@gmail.com
 
