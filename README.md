@@ -11,8 +11,6 @@
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装`gulp-sass`等模块
 - Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，直接修改源码`index.js`中的语法即可，修改为ES5语法就能正常使用
-- 考虑国内网络情况，安装脚本中，使用淘宝的cnpm安装gulp-sass，确保顺利安装。国内直接npm 安装`node-sass`或者`gulp-sass`可能会失败
-
 
 
 ###Install 安装
