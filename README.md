@@ -24,13 +24,6 @@ cd into your project dir and install:
 ###Usage 使用
 
 
-####目录说明
-
-* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
-* 通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
-
-
-
 ####In Your Gulpfile:
 
 - 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
@@ -130,6 +123,13 @@ gulp gm:compile
 
 
 ```
+
+
+####目录说明
+
+* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
+* 通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
 
 
 ###Any Question
