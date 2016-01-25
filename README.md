@@ -1,3 +1,13 @@
+
+[![Coverage Status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/logo.png)](https://thinkjs.org/)
+
+-----
+
+[![NPM version](https://img.shields.io/npm/v/gulpman.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
+[![Build status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
+[![Coverage Status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
+
+
 # gulpman
 
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
