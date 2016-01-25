@@ -4,8 +4,8 @@
 -----
 
 [![NPM version](https://img.shields.io/npm/v/gulpman.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
-[![Build status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
-[![Coverage Status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
+[![Build status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.png?style=flat-square)](http://badge.fury.io/js/gulpman)
+[![Coverage Status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.png?style=flat-square)](http://badge.fury.io/js/gulpman)
 
 
 # gulpman
