@@ -49,11 +49,8 @@ cd into your project dir and install:
 var gulp = require('gulp'),
     gman = require('gulpman')
 
-
 // your other tasks ...你的其他task
 // xxx ...
-
-
 
 
 /**
@@ -99,18 +96,10 @@ gman.config({
     'global': 'common' 
 })
 
-
-####全局模块目录介绍：
-
-- gulpman.config的配置中，lib和global都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
-- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
-- 注意全局模块不要有同名冲突。
-
-
-
 ```
 
-####CLI:
+
+####CLI 执行Task:
 
 ```Shell
 
@@ -139,6 +128,15 @@ gulp gm:compile
 
 * 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
 * 通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
+
+
+####什么是全局模块目录：
+
+- gulpman.config的配置中，lib和global都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
+- 注意全局模块不要有同名冲突。
+
 
 
 
