@@ -137,11 +137,8 @@ gulp gm:compile
 - 注意全局模块不要有同名冲突。
 
 
+###教程
+[浏览教程链接](http://karat.cc/article/56a351c3e48d2d05682aa0ac "karat.cc")
 
-
-###Any Question
-
-- 如有问题，请联系我：
-- xunuoi@163.com
-- xwlxyjk@gmail.com
-
+###License
+MIT
