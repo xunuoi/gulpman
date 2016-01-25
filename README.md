@@ -4,8 +4,8 @@
 -----
 
 [![NPM version](https://img.shields.io/npm/v/gulpman.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
-[![Build status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.png?style=flat-square)](http://badge.fury.io/js/gulpman)
-[![Coverage Status](https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.png?style=flat-square)](http://badge.fury.io/js/gulpman)
+<img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.png?style=flat-square" width="90" alt="Build status" />
+<img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.png?style=flat-square" width="106" alt="Coverage Status" />
 
 
 # gulpman
