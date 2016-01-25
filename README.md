@@ -1,12 +1,14 @@
 # gulpman
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- 基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高！会gulp就会定制自己的方案！
-- 集成SCSS ES6 Browserify cssnano uglify imagmein等常用组件，做到一站式自动化解决方案，同时简单、可控，定制、修改都超简单！
+- 基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
+- 集成SCSS|ES6|Babel|Browserify|cssnano|uglify|imagmein等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
+- 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改
 
 
 ###Introduction 说明
 - 支持Mac、Linux环境下安装、使用
-- Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装gulp-sass等模块。
+- Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装gulp-sass等模块
+- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，直接修改源码index.js中的语法即可，修改为ES5语法就能正常使用
 
 
 ###Install 安装

@@ -84,7 +84,7 @@ let base_source_type = 'js,css',
     img_source_type = 'png,PNG,jpg,JPG,gif,GIF,jpeg,JPEG,webp,WEBP,bmp,BMP',
 
     font_source_type = 'svg,SVG,tiff,ttf,woff,eot',
-    other_source_type = 'tpl,txt,mp3,mp4,ogg',
+    other_source_type = 'tpl,txt,mp3,mp4,ogg,webm,mpg,wav,wmv,mov',
 
     // the pure raw souce means the source do not need gulp deal!
     pure_source_type = [font_source_type, other_source_type ].join(),
@@ -488,9 +488,6 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 
 
 gulp.task('gm:develop', ['gm:compile'],()=>{
-    
-    //debug...
-    // return;
 
     console.log('\n*Source Compiled Succeed. \nPrepare for watching, please wait ...\n')
 
