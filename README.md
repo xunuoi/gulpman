@@ -1,8 +1,10 @@
 # gulpman
+
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
 - 基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 集成`SCSS|ES6|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
-- 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改
+- 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
+
 
 
 ###Introduction 说明
@@ -12,6 +14,7 @@
 - 考虑国内网络情况，安装脚本中，使用淘宝的cnpm安装gulp-sass，确保顺利安装。国内直接npm 安装`node-sass`或者`gulp-sass`可能会失败
 
 
+
 ###Install 安装
 cd into your project dir and install:
 
@@ -19,15 +22,22 @@ cd into your project dir and install:
 
 
 
+
 ###Usage 使用
 
+
 ####目录说明
-按照模块划分后，模块根目录可以是`./components`，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都要放到`foo`下，这个结构下做开发时非常清晰、高效，便于模块组织、资源定位等。通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
+* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
+* 通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
 
 
-####In Your gulpfile:
 
-只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中，使用时在命令行直接输入`gulp gm:publish`即可执行gulpman预置的任务
+####In Your Gulpfile:
+
+- 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
+- 使用时在命令行中直接输入`gulp gm:publish`即可执行gulpman预置的任务
+
 
 ```Javascript
 /**

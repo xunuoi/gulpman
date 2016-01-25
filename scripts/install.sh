@@ -32,11 +32,14 @@ else
     echo "\n\n*Install gulp-sass Failed! \n*You need install gulp-sass manually!"
 fi
 
+echo "     === * ==="
 
 echo "\n\nGulpman Install Succeed!\nNow you can use the gulpman module in your gulpfile.js'"
 
 echo "\n\n*some features:\nmodular structure\nauto progresss\nscss\nes6\nupdate browserify\njs/css/image minify\nrev-md5"
 
 echo "\n\n*API Detail: https://github.com/xunuoi/gulpman"
-echo "\n*Any Question: \n  xunuoi@163.com\n  xwlxyjk@gmail.com"
+echo "\n*Any Question: \n  xunuoi@163.com\n  xwlxyjk@gmail.com\n\n"
+
+echo "     === * ===\n\n\n\n"
 
