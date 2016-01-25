@@ -50,10 +50,16 @@ var gulp = require('gulp'),
 
 
 // your other tasks ...你的其他task
+// xxx ...
 
 
-// 设置路径、CDN、资源URL前缀等，API超级简单
-// if you want to set the dir, you can use config API:
+
+
+/**
+ * 配置gulpman ======================
+ * Use config API
+ * 设置路径、CDN、资源URL前缀等，API超级简单
+ */
 
 gman.config({
     
@@ -93,9 +99,17 @@ gman.config({
 })
 
 
+####全局模块目录介绍：
+
+- gulpman.config的配置中，lib和global都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
+- 注意全局模块不要有同名冲突。
+
+
+
 ```
 
-####In Your CLI:
+####CLI:
 
 ```Shell
 

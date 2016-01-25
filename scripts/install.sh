@@ -32,7 +32,7 @@ else
     echo "\n\n*Install gulp-sass Failed! \n*You need install gulp-sass manually!"
 fi
 
-echo "     === * ==="
+echo "\n\n\n     === * ==="
 
 echo "\n\nGulpman Install Succeed!\nNow you can use the gulpman module in your gulpfile.js'"
 
