@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Create Modular Front-End Build System, based on gulp ,easy useage",
   "engines": {
     "node": ">=4.2.0"
@@ -41,6 +41,7 @@
     "babel-preset-es2015": "^6.3.13",
     "browserify": "^11.2.0",
     "event-stream": "^3.3.2",
+    "object-assign": "^4.0.1",
     "globby": "^2.1.0",
     "gulp-babel": "^5.3.0",
     "gulp-imagemin": "^2.3.0",
