@@ -166,10 +166,14 @@ function resetVars(){
 
 function OSInform(title, _message, err){
     let message = _message || title
+    
+    try {
+        sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'")
 
-    sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'")
-
-    err && err.message && console.log('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n')
+        err && err.message && console.log('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n')
+    }catch(err){
+        console.log('Call System Inform-script Failed!')
+    }
 
     return {
       then (cb){
