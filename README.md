@@ -137,6 +137,30 @@ gulp gm:compile
 - 注意全局模块不要有同名冲突。
 
 
+####如何嵌入base64编码的图片
+
+* 只需要图片资源后面添加`?base64=true`即可
+* 打包时候会将图片生成base64编码替换到到html中
+
+
+#####对于html
+```html
+<p class="play"> 
+    <img width="480" alt="Karat 克拉" src="./img/testb64.png?base64=true" />
+</p>
+```
+
+#####对于CSS/SCSS
+
+```css
+
+.test {
+    background: url(./img/testb64.png?base64=true) no-repeat;
+}
+```
+
+
+
 ###教程
 [浏览教程链接](http://karat.cc/article/56a351c3e48d2d05682aa0ac "karat.cc")
 

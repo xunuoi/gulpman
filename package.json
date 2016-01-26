@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Create Modular Front-End Build System, based on gulp ,easy useage",
   "engines": {
     "node": ">=4.2.0"
@@ -22,8 +22,8 @@
     "es6",
     "build",
     "easy",
-	  "fis",
-	  "component"
+    "fis",
+    "component"
   ],
   "author": "Lucas X",
   "license": "MIT",
@@ -31,29 +31,29 @@
     "url": "https://github.com/xunuoi/gulpman/issues"
   },
   "homepage": "https://github.com/xunuoi/gulpman#readme",
-  "devDependencies":{
+  "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-sass": "^2.0.4"
   },
   "dependencies": {
-	"through2": "^2.0.0",
     "babel-core": "^6.4.0",
     "babel-preset-es2015": "^6.3.13",
     "browserify": "^11.2.0",
     "event-stream": "^3.3.2",
-    "object-assign": "^4.0.1",
     "globby": "^2.1.0",
     "gulp-babel": "^5.3.0",
+    "gulp-cssnano": "^2.1.0",
     "gulp-imagemin": "^2.3.0",
     "gulp-load-plugins": "^1.0.0-rc.1",
-    "gulp-cssnano": "^2.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev-all": "^0.8.22",
     "gulp-rev-replace": "^0.4.3",
     "gulp-sequence": "^0.4.4",
     "gulp-uglify": "^1.2.0",
     "imagemin-pngquant": "^4.1.2",
+    "object-assign": "^4.0.1",
     "shelljs": "^0.5.3",
+    "through2": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

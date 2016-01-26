@@ -1,7 +1,6 @@
 /**
  * Gulpman
  * @description FOR MODULAR FRONT-END SOURCE COMPILE SYSTEM
- * @version 1.0
  * @author Lucas X 
  * xwlxyjk@gmail.com
  */
@@ -23,7 +22,8 @@ let gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     es = require('event-stream'),
     globby = require('globby'),
-    through = require('through2')
+    through = require('through2'),
+    base64 = require('./base64')
 
     // cheerio = require('gulp-cheerio')
 
@@ -281,6 +281,15 @@ gulp.task('gm:compile-sass', ()=>{
         OSInformError('SCSS Compile Error', err)
         // .then(()=>console.error(errMessage))
     })
+    .pipe(base64({
+        'isAbsolutePath': isAbsolutePath,
+        'baseDir': RUNTIME_STATIC_PATH,
+        'type': 'css',
+        'rule': new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+'png|jpg|gif'+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
+    }))
+    .on('error', function(err){
+        OSInformError('CSS Img-Base64 Error', err)
+    })
     .pipe(gulp.dest(RUNTIME_STATIC_PATH))
     // 这里没有复制到static的备份目录
 })
@@ -386,17 +395,24 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         let contents = file.contents.toString()
 
         // let pt1 = /(?:['"]?)([\w\.\-\?\-\/]+?(\.(css|js|tpl|jpg|JPG|png|PNG|gif|GIF|jpeg|JPEG|svg|SVG|ttf|woff|eot)))(?:['"]?)/gm
-        let src_pt = new RegExp('(?:[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?:[\'"]?)', 'gm')
+        
+        let src_pt = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?=\\?base64\\=true)*(?=[\'"]?)', 'gm')
 
         let tmp_rs_list = contents.match(src_pt), rs_list = null
 
         tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
 
-        rs_list && rs_list.forEach(e=>{
+        rs_list && rs_list.forEach(epath=>{
             // remove '," on start and end
-            let epath = e.slice(1, -1)
 
-            contents = contents.replace(e, '"'+j(_urlPrefix, fdirname, epath)+'"')
+            let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?base64\\=true)*(?=[\'"]?)', 'gm')
+
+            // console.log('innerReg: ', innerReg)
+
+            // console.log(contents.match(innerReg))
+
+
+            contents = contents.replace(innerReg, j(_urlPrefix, fdirname, epath)+'$2')
         })
 
         file.contents = new Buffer(contents)
@@ -406,6 +422,15 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     }))
     .on('error', err=>{
         OSInformError('ParseHtml Error', err)
+    })
+    .pipe(base64({
+        'isAbsolutePath': isAbsolutePath,
+        'baseDir': RUNTIME_ASSETS_PATH,
+        'type': 'html',
+        'rule': new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+'png|jpg|gif'+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
+    }))
+    .on('error', function(err){
+        OSInformError('Html Img-Base64 Error', err)
     })
     .pipe(gulp.dest(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH))
 }
