@@ -95,7 +95,26 @@ gman.config({
     'global': 'common' 
 })
 
+
 ```
+
+
+####支持复杂目录和多级目录设定:
+
+* 比如下面这种复杂路径：
+
+```Javascript
+gulpman.config({
+    'is_absolute': false,
+    'components': 'components/cc',
+    'runtime_views': 'runtime_views/rv',
+    'dist_views': 'dist_views/dv/dv',
+
+    'dist_assets': 'dist_assets/da',
+    'runtime_assets': 'runtime_assets/ra/ra',
+})
+```
+
 
 
 ####CLI 执行Task:

@@ -1,6 +1,6 @@
 /**
  * Gulpman
- * @description FOR MODULAR FRONT-END SOURCE COMPILE SYSTEM
+ * FOR MODULAR FRONT-END SOURCE COMPILE SYSTEM
  * @author Lucas X 
  * xwlxyjk@gmail.com
  */
@@ -16,6 +16,7 @@ let path = require('path'),
 let gulp = require('gulp'),
     p = require('gulp-load-plugins')(),
 
+    // modules
     pngquant = require('imagemin-pngquant'),
     browserify = require('browserify'),
     buffer = require('vinyl-buffer'),
@@ -23,10 +24,11 @@ let gulp = require('gulp'),
     es = require('event-stream'),
     globby = require('globby'),
     through = require('through2'),
-    base64 = require('./base64')
 
-    // cheerio = require('gulp-cheerio')
-
+    // utils
+    gmutil = require('./gmutil'),
+    base64 = require('./base64'),
+    store = require('./store')
 
 /**
  * *** FOR GULPER ***
@@ -82,6 +84,7 @@ let RUNTIME_STATIC_TMP_PATH = j(RUNTIME_ASSETS_PATH, '.tmp_raw_static')
 // define raw source type ===================================
 let base_source_type = 'js,css',
     img_source_type = 'png,PNG,jpg,JPG,gif,GIF,jpeg,JPEG,webp,WEBP,bmp,BMP',
+    img_source_reg = img_source_type.split(',').join('|'),
 
     font_source_type = 'svg,SVG,tiff,ttf,woff,eot',
     other_source_type = 'tpl,txt,mp3,mp4,ogg,webm,mpg,wav,wmv,mov',
@@ -168,12 +171,15 @@ function OSInform(title, _message, err){
     let message = _message || title
     
     try {
+        // call the os inform
         sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'")
 
-        err && err.message && console.log('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n')
     }catch(err){
-        console.log('Call System Inform-script Failed!')
+        gmutil.log('*Call System Inform-script Failed!', 'yellow')
     }
+
+    // print the err messsage
+    err && err.message && gmutil.log('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n', 'red')
 
     return {
       then (cb){
@@ -188,6 +194,11 @@ function OSInformError(title, err, cb){
     
     return OSInform(title, filePath, err)
 
+}
+
+
+function getB64ImgReg(){
+    return new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+img_source_reg+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
 }
 
 
@@ -240,7 +251,7 @@ function do_browserify(){
                  */
                 
                 path['dirname'] = path['dirname'].replace(RUNTIME_STATIC_TMP_PATH, RUNTIME_STATIC_PATH)
-                // console.log(path)
+
                 path.extname = '.js'
             }))
             .pipe(gulp.dest('./'))
@@ -273,25 +284,33 @@ gulp.task('gm:compile-copy', ()=>{
 })
 
 
-gulp.task('gm:compile-sass', ()=>{
-    
+function compile_sass(singleFile){
+
     return gulp.src(sass_source)
     .pipe(p.sass())
     .on('error', function(err){
         OSInformError('SCSS Compile Error', err)
-        // .then(()=>console.error(errMessage))
+        // .then(()=>gmutil.error(errMessage))
     })
     .pipe(base64({
         'isAbsolutePath': isAbsolutePath,
+        'relevancyDir': RUNTIME_ASSETS_PATH,
         'baseDir': RUNTIME_STATIC_PATH,
+        // 'components': COMPONENTS_PATH,
+        'isDevelop': isDevelop,
         'type': 'css',
-        'rule': new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+'png|jpg|gif'+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
+        'rule': getB64ImgReg()
     }))
     .on('error', function(err){
         OSInformError('CSS Img-Base64 Error', err)
     })
     .pipe(gulp.dest(RUNTIME_STATIC_PATH))
     // 这里没有复制到static的备份目录
+}
+
+gulp.task('gm:compile-sass', ()=>{
+    
+    return compile_sass()
 })
 
 
@@ -368,7 +387,7 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
             return cb()
         }
         if (file.isStream()) {
-            console.log('ParseHtml Error: Streaming not supported')
+            gmutil.error('*ParseHtml Error: Streaming not supported')
             return cb()
         }
 
@@ -403,21 +422,17 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
 
         rs_list && rs_list.forEach(epath=>{
-            // remove '," on start and end
 
             let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?base64\\=true)*(?=[\'"]?)', 'gm')
-
-            // console.log('innerReg: ', innerReg)
-
-            // console.log(contents.match(innerReg))
-
 
             contents = contents.replace(innerReg, j(_urlPrefix, fdirname, epath)+'$2')
         })
 
         file.contents = new Buffer(contents)
         this.push(file)
-        console.log('*Raw HTML File Parsed: '+file.relative)
+
+        gmutil.tip('*Raw HTML File Parsed: '+file.relative)
+
         cb()
     }))
     .on('error', err=>{
@@ -425,12 +440,16 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     })
     .pipe(base64({
         'isAbsolutePath': isAbsolutePath,
+        'relevancyDir': RUNTIME_ASSETS_PATH,
         'baseDir': RUNTIME_ASSETS_PATH,
+        'views': _isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH,
+        'dist_assets': DIST_ASSETS_PATH,
+        'isDevelop': isDevelop,
         'type': 'html',
-        'rule': new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+'png|jpg|gif'+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
+        'rule': getB64ImgReg()
     }))
     .on('error', function(err){
-        OSInformError('Html Img-Base64 Error', err)
+        OSInformError('HTML Img-Base64 Error', err)
     })
     .pipe(gulp.dest(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH))
 }
@@ -461,7 +480,7 @@ function delChangedFile(epath, delOutDir, type){
 
     let delFilePath = j(delOutDir, relPath)
 
-    console.log('Delete File: '+ delFilePath)
+    gmutil.tip('Delete File: '+ delFilePath)
 
     // 删除输出的文件
     sh.rm('-rf', delFilePath)
@@ -505,7 +524,7 @@ gulp.task('update-es6', ()=>{
         path.dirname = j(RUNTIME_STATIC_TMP_PATH, relPath)
         path.extname = '.es6'
         
-        console.log('*ES6 File Changed: ' + epath)
+        gmutil.tip('*ES6 File Changed: ' + epath)
 
     }))
     .pipe(gulp.dest('./'))
@@ -516,9 +535,11 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 })
 
 
-gulp.task('gm:develop', ['gm:compile'],()=>{
+gulp.task('gm:develop', ['gm:compile'], function(){
+    
+    var _gulp = this
 
-    console.log('\n*Source Compiled Succeed. \nPrepare for watching, please wait ...\n')
+    gmutil.warn('\n*Source Compiled Succeed. \n*Loading source. Waiting ...\n')
 
 
     // watch es6\js
@@ -531,7 +552,6 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
                 updateES6Compile(event)
                 break
             case 'added':
-                // console.log('**pass js added')
                 updateES6Compile(event)
                 break
 
@@ -550,7 +570,6 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
     let css_watcher = gulp.watch(sass_source, ['gm:compile-sass'])
 
     css_watcher.on('change', event=>{
-      // console.log(event)
 
       let epath = event.path,
           etype = event.type
@@ -580,10 +599,10 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
             let relPath = getRelativePath(epath)
             
             let rawHtmlFile = j(COMPONENTS_PATH, relPath)
-            // console.log('Html Changed: '+rawHtmlFile)
             
             let basepath = j(_cwd, COMPONENTS_PATH)
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
+
         }else if(etype == 'deleted'){
 
             delChangedFile(epath, RUNTIME_VIEWS_PATH)
@@ -595,7 +614,7 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
             sh.cp('-rf', epath, f.dirPath)
             sh.rm('-rf', oldf.tarPath)
 
-            console.log('Rename HTML File: '+oldf.tarPath)
+            gmutil.tip('Rename HTML File: '+oldf.tarPath)
 
         }else {
             // ddd
@@ -607,7 +626,7 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
     // raw source
     let raw_watcher = gulp.watch(all_raw_source)
 
-    raw_watcher.on('change', event=>{
+    raw_watcher.on('change', function(event) {
         let epath = event.path,
             file_extname = path.extname(epath),
 
@@ -616,25 +635,44 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
 
         if(event.type == 'added' || event.type == 'changed'){
             sh.cp('-rf', epath, f.dirPath)
-            console.log('Copy Raw File To: '+f.tarPath)
+            gmutil.tip('Copy Raw File To: '+f.tarPath)
 
             if(file_extname == '.js') {
                 sh.cp('-rf', epath, tmp_f.dirPath)
-                console.log('Copy Raw File To: '+tmp_f.tarPath)
+                gmutil.tip('Copy Raw File To: '+tmp_f.tarPath)
+            }
+
+            // check relevancy images
+            if(event.type == 'changed') {
+
+                store.check(epath, RUNTIME_ASSETS_PATH, RUNTIME_STATIC_PATH, COMPONENTS_PATH, 
+                {
+                    'html': function (rawHtmlFile){
+                        // html实现了增量编译base64文件
+                        let basepath = j(_cwd, COMPONENTS_PATH)
+                        parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
+                    },
+                    // css 目前还是普通编译
+                    'css': compile_sass
+                })
+                
+                
             }
             
         }else if(event.type == 'deleted'){
             sh.rm('-rf', f.tarPath)
-            console.log('Delete Raw File: '+f.tarPath)
+            gmutil.tip('Delete Raw File: '+f.tarPath)
             if(file_extname == '.js') {
                 sh.rm('-rf', tmp_f.tarPath)
-                console.log('Delete Raw File: '+f.tarPath)
+                gmutil.tip('Delete Raw File: '+f.tarPath)
             }
+
         }else if(event.type == 'renamed'){
             let oldPath = event.old,
                 oldf = getTarPath(oldPath, RUNTIME_STATIC_PATH),
                 old_tmpf = getTarPath(oldPath, RUNTIME_STATIC_TMP_PATH)
-            console.log('Rename Raw File: '+oldf.tarPath)
+            
+            gmutil.tip('Rename Raw File: '+oldf.tarPath)
 
             sh.cp('-rf', epath, f.dirPath)
             sh.rm('-rf', oldf.tarPath)
@@ -642,16 +680,19 @@ gulp.task('gm:develop', ['gm:compile'],()=>{
             if(file_extname == '.js') {
                 sh.cp('-rf', epath, tmp_f.dirPath)
                 sh.rm('-rf', old_tmpf.tarPath)
-                console.log('Delete Raw File: '+f.tarPath)
+                gmutil.tip('Delete Raw File: '+f.tarPath)
             }
 
         }else {
-          console.log('Other Event: ', event)
+          gmutil.warn('Other Event: \n' + event)
         }
     })
+    .on('error', err=>{
+        console.log('Error: ', err)
+    })
 
-
-    console.log('\n*Now Watching For Development:\n')
+    // ready for watch
+    gmutil.tip('\n*Now Watching For Development:\n')
      
 })
 
@@ -700,8 +741,8 @@ gulp.task('gm:js', ()=>{
     return gulp.src([js_source, except_lib_source])
     .pipe(p.uglify())
     .on('error', function (err){ 
-        console.log('*Warning \n*Uglify Error: \n', err.message)
-        console.log('*Passed ...')
+        gmutil.error('*Warning \n*Uglify Error: \n', err.message)
+        gmutil.warn('*Passed ...')
         return this
     })
     .pipe(gulp.dest(DIST_STATIC_PATH))
@@ -864,6 +905,9 @@ exports['config'] = function(opts){
 
     opts['is_absolute'] !== undefined && (isAbsolutePath = opts['is_absolute'])
 
+    // gmutil.error('ttt*: '+opts['is_absolute'])
+    // gmutil.error('isAbsolutePath: '+isAbsolutePath)
+    // console.log(isAbsolutePath)
 
     opts['cdn_prefix'] && (cdn_prefix =  opts['cdn_prefix'])
 
