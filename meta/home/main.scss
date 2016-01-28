@@ -6,3 +6,31 @@
 .logo {
     background: url(./img/logo.png) no-repeat;
 }
+
+.header {
+    width: 600px;
+    margin: 0 auto;
+    text-align: center;
+
+    p {
+        text-align: center;
+    }
+}
+
+.demo-container {
+    margin-top: 30px;
+    border: 1px dashed #8EB139;
+    padding: 30px;
+    background-color: #5B9EB2;
+    border-radius: 8px;
+
+    ol li p {
+        color: #14581F;
+        text-shadow: 2px 2px 2px #9A9A9A;
+    }
+
+    h3 {
+        color: white;
+    }
+
+}

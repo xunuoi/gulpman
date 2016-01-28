@@ -32,17 +32,17 @@ function parseSource(images, file, refType, content, opts, baseDir, relevancyDir
         // 现在相对路径计算繁琐了
         var pureFilePath;
 
-        console.log('\n\n')
-        gmutil.error(refType)
-        console.log(file.cwd)
-        console.log(baseDir)
-        console.log(fileDir)
-        console.log(file.relative)
-        console.log(file.path)
-        console.log(imageURL)
-        // console.log(opts['dist_assets'])
-        // console.log(opts['components'])
-        console.log('\n\n')
+        // console.log('\n\n')
+        // gmutil.error(refType)
+        // console.log(file.cwd)
+        // console.log(baseDir)
+        // console.log(fileDir)
+        // console.log(file.relative)
+        // console.log(file.path)
+        // console.log(imageURL)
+        // // console.log(opts['dist_assets'])
+        // // console.log(opts['components'])
+        // console.log('\n\n')
 
         // var 
 
@@ -78,9 +78,6 @@ function parseSource(images, file, refType, content, opts, baseDir, relevancyDir
 
                     var dist_assets_path = j(file.cwd, opts['dist_assets']),
                         runtime_assets_path = j(file.cwd, baseDir)
-
-                    // console.log('dist_assets: ', dist_assets_path)
-                    // console.log('runtime_assets: ', runtime_assets_path)
 
                     var pureFilePath = srcPath.replace(dist_assets_path, runtime_assets_path)
 

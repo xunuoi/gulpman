@@ -52,6 +52,12 @@ let gulp = require('gulp'),
  * 5. md5和非md5文件目前是混合在一起的
  */
 
+// define babel opts
+
+let babelOpts = {
+    "presets": ["es2015", "react"]
+}
+
 
 // define base vars ========================================
 let isDevelop = true,
@@ -111,7 +117,6 @@ let sass_source = j(COMPONENTS_PATH, '**/*.{scss,sass}'),
 
 // to-be-published source ================================
 let js_source = j(RUNTIME_STATIC_PATH, '**/*.js'),
-    // except_uglifyjs_source = '!' + j(RUNTIME_STATIC_PATH, lib_dir, '**/*{.min,-min,Gulpfile,gulpfile}.js'),
     lib_source = j(RUNTIME_STATIC_PATH, lib_dir, '**/*.*'),
     except_lib_source = '!'+lib_source,
 
@@ -275,6 +280,13 @@ gulp.task('gm:clean', ()=>{
     ])
 })
 
+// clean dir includes components
+gulp.task('gm:clean-all', ['gm:clean'],()=>{
+    sh.rm('-rf', [
+        COMPONENTS_PATH,
+    ])
+})
+
 
 gulp.task('gm:compile-copy', ()=>{
     return gulp.src(all_raw_source)
@@ -317,11 +329,13 @@ gulp.task('gm:compile-sass', ()=>{
 gulp.task('gm:compile-es6', ()=>{
 
     return gulp.src(es6_source)
-    .pipe(p.babel())
+    .pipe(p.babel(babelOpts))
     .on('error', err=>{
         OSInformError('Babel Error', err)
     })
     .pipe(p.rename(path=>{
+        // 这里有一部分是从es6转成的.js，也有一部分是jsx转成的.js
+        // 此处都统一扩展名设置为.es6
         path.extname = '.es6'
     }))
     .pipe(gulp.dest(RUNTIME_STATIC_TMP_PATH))
@@ -377,7 +391,7 @@ function updateES6Compile(event){
 }
 
 
-
+// 解析html文件中的资源路径和做处理
 function parseRawHTML(b, basepath, _isRuntimeDir) {
 
     return b.pipe(through.obj(function (file, enc, cb){
@@ -412,8 +426,6 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
 
 
         let contents = file.contents.toString()
-
-        // let pt1 = /(?:['"]?)([\w\.\-\?\-\/]+?(\.(css|js|tpl|jpg|JPG|png|PNG|gif|GIF|jpeg|JPEG|svg|SVG|ttf|woff|eot)))(?:['"]?)/gm
         
         let src_pt = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?=\\?base64\\=true)*(?=[\'"]?)', 'gm')
 
@@ -421,8 +433,10 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
 
         tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
 
+        // 对于匹配的url选项，比如./img/demo.png，进行循环处理
         rs_list && rs_list.forEach(epath=>{
 
+            // 对于base64的参数标识要保留，不能清理掉，因为后续要嵌入base64
             let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?base64\\=true)*(?=[\'"]?)', 'gm')
 
             contents = contents.replace(innerReg, j(_urlPrefix, fdirname, epath)+'$2')
@@ -508,7 +522,7 @@ gulp.task('update-es6', ()=>{
         etype = watch_event.type
 
     return gulp.src(epath)
-    .pipe(p.babel())
+    .pipe(p.babel(babelOpts))
     .pipe(p.rename(path=>{
         let relPath = getRelativePath(epath)
 
@@ -529,6 +543,7 @@ gulp.task('update-es6', ()=>{
     }))
     .pipe(gulp.dest('./'))
 })
+
 
 gulp.task('update_browserify', ['update-es6'], ()=>{
     return do_browserify()
@@ -882,20 +897,48 @@ gulp.task('gm:publish', p.sequence(
 
 
 // init dir and create some meta files
+gulp.task('gm:generate-config', ()=>{
+
+    let conf_path = j(__dirname ,'./assets/.babelrc')
+
+    return gulp.src(conf_path)
+    .pipe(gulp.dest('./'))
+})
+
+
+gulp.task('gm:generate-components-dir', ()=>{
+    // create componetns dir
+    // May invalid for windows
+    sh.exec('mkdir '+COMPONENTS_PATH+' >& /dev/null')
+})
+
+
+// init dir and create some meta files
+gulp.task('gm:generate-lib', ()=>{
+
+    let prelib_path = j(__dirname ,'./presetlib/**/*.*')
+
+    return gulp.src(prelib_path)
+    .pipe(gulp.dest(j(COMPONENTS_PATH, lib_dir)))
+})
+
+
+// init dir and create some meta files
 gulp.task('gm:generate-meta', ()=>{
 
     let meta_path = j(__dirname ,'./meta/**/*.*')
-
-    // May not useful for windows
-    sh.exec('mkdir '+COMPONENTS_PATH+' >& /dev/null')
-
-    // sh.mkdir(COMPONENTS_PATH)
 
     return gulp.src(meta_path)
     .pipe(gulp.dest(COMPONENTS_PATH))
 })
 
-gulp.task('gm:init', p.sequence('gm:clean' ,'gm:generate-meta', 'gm:compile'))
+gulp.task('gm:init', p.sequence(
+    'gm:clean',
+    'gm:generate-components-dir', 
+    ['gm:generate-meta', 'gm:generate-lib'],
+    // 'gm:generate-config',
+    'gm:compile'
+))
 
 
 // API ============================
