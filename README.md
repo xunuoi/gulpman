@@ -61,9 +61,12 @@ var gulp = require('gulp'),
 
 gman.config({
     
-    // 是否使用绝对路径，默认true,推荐使用，方便服务器配置。比如`/static/home/main.js`这种风格。
-    // 如果is_absolute是false, 那么可能是`../../assets/static/home/main.js`这种风格。
-    // 具体取决于项目情况、服务端配置等。
+    // 是否使用绝对路径，默认值true, 推荐使用，方便服务器配置。比如`/static/home/main.js`这种风格。
+
+    // 如果无服务端情况下，本地调试，推荐设置is_absolute为false, 那么会是类似`../../assets/static/home/main.js`这种风格。
+    这种情况直接打开html文件就可以正常浏览和运行！
+
+    // `is_absolute` 具体取决于项目情况、服务端配置等。
     // if set the assets url prefix as absolute or relative, default: true
     'is_absolute': true,
 
@@ -98,6 +101,17 @@ gman.config({
 
 
 ```
+
+####对于is_absolute的说明：
+
+* is_absolute是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
+
+* [常用]当使用服务器配置静态目录的情况下，推荐使用绝对目录。比如配合nginx，指定某个目录为静态资源目录。类似`/static/home/main.js`这种风格。
+
+* 如果无服务端情况下，有需要本地调试，推荐设置is_absolute为false, 即启用相对路径。类似`../../assets/static/home/main.js`这种风格。
+
+* 当is_absolute为false(启用相对路径)的情况下，直接打开输出的views目录下的html文件，就可以正常浏览、运行、调试
+
 
 
 ####支持复杂目录和多级目录设定:
