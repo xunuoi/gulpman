@@ -161,8 +161,9 @@ gulp gm:compile
 ```
 
 ####只监视某个component目录来开发：
+
 * 比如说，只监视components目录下的home模块
-* 
+
 ```Shell
 
 gulp gm:develop -c home
