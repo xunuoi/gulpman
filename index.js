@@ -25,10 +25,10 @@ let gulp = require('gulp'),
     globby = require('globby'),
     through = require('through2'),
 
-    // utils
-    gmutil = require('./gmutil'),
-    base64 = require('./base64'),
-    store = require('./store')
+    // gulpman utils
+    gmutil = require('./lib/gmutil'),
+    base64 = require('./lib/base64'),
+    store = require('./lib/store')
 
 /**
  * *** FOR GULPER ***
@@ -52,48 +52,49 @@ let gulp = require('gulp'),
  * 5. md5和非md5文件目前是混合在一起的
  */
 
-// define babel opts
 
-let babelOpts = {
-    "presets": ["es2015", "react"]
+// define base vars ========================================
+let isDevelop = true
+
+// get the cwd
+const _cwd = process.cwd()
+
+let _opts = {
+
+    // is enable the absolute prefix url
+    'is_absolute': true,
+
+    // source url prefix
+    'cdn_prefix': '',
+    'url_prefix': '/static',
+
+    // define babel optionals
+    'babel': {
+        'presets': ['es2015', 'react']
+    },
+
+    // library path and global module path
+    'lib': 'lib',
+    'global': 'global',
+
+    // the components source dir
+    'components': './components',
+
+    'runtime_views': './views',
+    'dist_views': './views_dist',
+
+    'runtime_assets': './assets',
+    'dist_assets': './assets_dist'
 }
 
 
-// define base vars ========================================
-let isDevelop = true,
-    isAbsolutePath = true
-
-let _cwd = process.cwd()
-
-let cdn_prefix = '',
-    ASSETS_URL_PREFIX = '/static'
-
-
-
-// the components source dir
-let COMPONENTS_PATH = './components'
-
-let RUNTIME_VIEWS_PATH = './views'
-let DIST_VIEWS_PATH = './views_dist'
-
-let RUNTIME_ASSETS_PATH = './assets'
-let DIST_ASSETS_PATH = './assets_dist'
-
-
-let DIST_STATIC_PATH = j(DIST_ASSETS_PATH, ASSETS_URL_PREFIX)
-
-let RUNTIME_STATIC_PATH = j(RUNTIME_ASSETS_PATH, ASSETS_URL_PREFIX)
-
-let RUNTIME_STATIC_TMP_PATH = j(RUNTIME_ASSETS_PATH, '.tmp_raw_static')
-
-
 // define raw source type ===================================
-let base_source_type = 'js,css',
+const base_source_type = 'js,css',
     img_source_type = 'png,PNG,jpg,JPG,gif,GIF,jpeg,JPEG,webp,WEBP,bmp,BMP',
     img_source_reg = img_source_type.split(',').join('|'),
 
     font_source_type = 'svg,SVG,tiff,ttf,woff,eot',
-    other_source_type = 'tpl,txt,mp3,mp4,ogg,webm,mpg,wav,wmv,mov',
+    other_source_type = 'tpl,txt,mp3,mp4,ogg,webm,mpg,wav,wmv,mov,ico',
 
     // the pure raw souce means the source do not need gulp deal!
     pure_source_type = [font_source_type, other_source_type ].join(),
@@ -103,72 +104,66 @@ let base_source_type = 'js,css',
 
 
 // uncompiled source =====================================
-let lib_dir = 'lib',
-    global_module = 'common'
+let sass_source,
+    es6_source,
+
+    all_raw_source,
+
+    html_source,
+
+    // For publish source 
+    js_source,
+    lib_source,
+    except_lib_source,
+
+    dist_lib_path,
+    css_source,
+    img_source,
+    pure_source,
+
+    dist_html_source,
+    dist_css_source,
+    dist_all_raw_source
 
 
-let sass_source = j(COMPONENTS_PATH, '**/*.{scss,sass}'),
-    es6_source = j(COMPONENTS_PATH, '**/*.{es6,jsx}'),
+// init vars
+function initVars(){
+    
+    _opts['dist_static'] = j(_opts['dist_assets'], _opts['url_prefix'])
 
-    all_raw_source = j(COMPONENTS_PATH, '**/*.{'+all_raw_source_type+'}'),
+    _opts['runtime_static'] = j(_opts['runtime_assets'], _opts['url_prefix'])
 
-    html_source = [j(COMPONENTS_PATH,'**/*.html'), '!'+j(COMPONENTS_PATH, lib_dir, '**/*.html')]
+    _opts['runtime_static_tmp'] = j(_opts['runtime_assets'], '.tmp_raw_static')
 
+    // components sources
+    sass_source = j(_opts['components'], '**/*.{scss,sass}')
+    es6_source = j(_opts['components'], '**/*.{es6,jsx}')
 
-// to-be-published source ================================
-let js_source = j(RUNTIME_STATIC_PATH, '**/*.js'),
-    lib_source = j(RUNTIME_STATIC_PATH, lib_dir, '**/*.*'),
-    except_lib_source = '!'+lib_source,
+    all_raw_source = j(_opts['components'], '**/*.{'+all_raw_source_type+'}')
 
-    dist_lib_path = j(DIST_STATIC_PATH, lib_dir),
-    css_source = j(RUNTIME_STATIC_PATH, '**/*.css'),
-    img_source = j(RUNTIME_STATIC_PATH,'**/*.{'+img_source_type+'}'),
-    pure_source = j(RUNTIME_STATIC_PATH, '**/*.{'+pure_source_type+'}')
-
-
-let dist_html_source = j(DIST_VIEWS_PATH, '**/*.html'),
-    dist_css_source = j(DIST_STATIC_PATH, '**/*.css'),
-    dist_all_raw_source = j(DIST_ASSETS_PATH, '**/*.{'+all_raw_source_type+'}')
+    html_source = [j(_opts['components'],'**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')]
 
 
-// update the options 
-function resetVars(){
+    // to-be-published source ================================
+    js_source = j(_opts['runtime_static'], '**/*.js')
+    lib_source = j(_opts['runtime_static'], _opts['lib'], '**/*.*')
+    except_lib_source = '!'+lib_source
 
+    dist_lib_path = j(_opts['dist_static'], _opts['lib'])
+    css_source = j(_opts['runtime_static'], '**/*.css')
+    img_source = j(_opts['runtime_static'],'**/*.{'+img_source_type+'}')
+    pure_source = j(_opts['runtime_static'], '**/*.{'+pure_source_type+'}')
 
-    DIST_STATIC_PATH = j(DIST_ASSETS_PATH, ASSETS_URL_PREFIX),
+    // dist source path
+    dist_html_source = j(_opts['dist_views'], '**/*.html')
+    dist_css_source = j(_opts['dist_static'], '**/*.css')
+    dist_all_raw_source = j(_opts['dist_assets'], '**/*.{'+all_raw_source_type+'}')
 
-    RUNTIME_STATIC_PATH = j(RUNTIME_ASSETS_PATH, ASSETS_URL_PREFIX),
-
-    RUNTIME_STATIC_TMP_PATH = j(RUNTIME_ASSETS_PATH, '.tmp_raw_static'),
-
-    // the pure raw souce means the source do not need gulp deal!
-    pure_source_type = [font_source_type, other_source_type ].join(),
-    // all raw source
-    all_raw_source_type = [base_source_type, img_source_type, font_source_type, other_source_type].join(),
-    type_pt_str = all_raw_source_type.split(',').join('|'),
-
-    sass_source = j(COMPONENTS_PATH, '**/*.{scss,sass}'),
-    es6_source = j(COMPONENTS_PATH, '**/*.{es6,jsx}'),
-
-    all_raw_source = j(COMPONENTS_PATH, '**/*.{'+all_raw_source_type+'}'),
-
-    html_source = [j(COMPONENTS_PATH,'**/*.html'), '!'+j(COMPONENTS_PATH, lib_dir, '**/*.html')],
-
-    js_source = j(RUNTIME_STATIC_PATH, '**/*.js'),
-
-    lib_source = j(RUNTIME_STATIC_PATH, lib_dir, '**/*.*'),
-    except_lib_source = '!'+lib_source,
-
-    dist_lib_path = j(DIST_STATIC_PATH, lib_dir),
-    css_source = j(RUNTIME_STATIC_PATH, '**/*.css'),
-    img_source = j(RUNTIME_STATIC_PATH,'**/*.{'+img_source_type+'}'),
-    pure_source = j(RUNTIME_STATIC_PATH, '**/*.{'+pure_source_type+'}'),
-
-
-    dist_html_source = j(DIST_VIEWS_PATH, '**/*.html'),
-    dist_css_source = j(DIST_STATIC_PATH, '**/*.css'),
-    dist_all_raw_source = j(DIST_ASSETS_PATH, '**/*.{'+all_raw_source_type+'}')
 }
+
+// init vars before gulpman tasks
+initVars()
+
 
 // COMMON UTILS FN  ========================================
 
@@ -180,11 +175,11 @@ function OSInform(title, _message, err){
         sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'")
 
     }catch(err){
-        gmutil.log('*Call System Inform-script Failed!', 'yellow')
+        gmutil.warn('*Call System Inform Failed!')
     }
 
     // print the err messsage
-    err && err.message && gmutil.log('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n', 'red')
+    err && err.message && gmutil.error('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n')
 
     return {
       then (cb){
@@ -210,27 +205,27 @@ function getB64ImgReg(){
 // browserify 
 function browserified(fpath, sourceDir){
 
-    /*let pathList = global_module.filter(d=>{
+    /*let pathList = _opts['global'].filter(d=>{
         return j(sourceDir, d)
     })*/
 
-    let _bopts = {
+    let _bOpts = {
         entries: fpath,
         debug: true,
         extensions: ['.es6', '.jsx', '.js'],
 
         //global modular
         paths: [
-            j(sourceDir, lib_dir),
-            j(sourceDir, global_module)
+            j(sourceDir, _opts['lib']),
+            j(sourceDir, _opts['global'])
         ]
     }
 
     // use wathcify to browseirfy
-    // var watchifybOpts = Object.assign(_bopts, watchify.args)
+    // var watchifybOpts = Object.assign(_bOpts, watchify.args)
     // return watchify(browserify(watchifybOpts)).bundle()
 
-    return browserify(_bopts)
+    return browserify(_bOpts)
     .bundle()
     .pipe(source(fpath))
     .pipe(buffer())
@@ -242,11 +237,11 @@ function browserified(fpath, sourceDir){
 
 
 function do_browserify(){
-      var files = globby.sync(j(RUNTIME_STATIC_TMP_PATH, '**/*.es6')),
+      var files = globby.sync(j(_opts['runtime_static_tmp'], '**/*.es6')),
         tasks = files.map((entry)=>{
             // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
 
-            return browserified(entry, RUNTIME_STATIC_TMP_PATH)
+            return browserified(entry, _opts['runtime_static_tmp'])
             .pipe(p.rename(path=>{
 
                 /**
@@ -255,7 +250,7 @@ function do_browserify(){
                  * 这样.tmp_raw_static目录可以被watch中触发的打包服务
                  */
                 
-                path['dirname'] = path['dirname'].replace(RUNTIME_STATIC_TMP_PATH, RUNTIME_STATIC_PATH)
+                path['dirname'] = path['dirname'].replace(_opts['runtime_static_tmp'], _opts['runtime_static'])
 
                 path.extname = '.js'
             }))
@@ -271,11 +266,11 @@ function do_browserify(){
 gulp.task('gm:clean', ()=>{
     sh.rm('-rf', [
 
-        RUNTIME_VIEWS_PATH,
-        DIST_VIEWS_PATH,
+        _opts['runtime_views'],
+        _opts['dist_views'],
 
-        RUNTIME_ASSETS_PATH,
-        DIST_ASSETS_PATH
+        _opts['runtime_assets'],
+        _opts['dist_assets']
 
     ])
 })
@@ -283,32 +278,37 @@ gulp.task('gm:clean', ()=>{
 // clean dir includes components
 gulp.task('gm:clean-all', ['gm:clean'],()=>{
     sh.rm('-rf', [
-        COMPONENTS_PATH,
+        _opts['components'],
     ])
 })
 
 
 gulp.task('gm:compile-copy', ()=>{
     return gulp.src(all_raw_source)
-    .pipe(gulp.dest(RUNTIME_STATIC_PATH))
+    .pipe(gulp.dest(_opts['runtime_static']))
     // 复制一份 非编译到static备份目录
-    .pipe(gulp.dest(RUNTIME_STATIC_TMP_PATH))
+    .pipe(gulp.dest(_opts['runtime_static_tmp']))
 })
 
 
 function compile_sass(singleFile){
+    
+    // 此处增量编译scss, 当处于监视状态，只编译修改了的scss文件
+    // 此处还没有关联到sass的增量，只关联了raw source中的css
+    // @todo
+    let _sass_source = singleFile || sass_source
 
-    return gulp.src(sass_source)
+    return gulp.src(_sass_source)
     .pipe(p.sass())
     .on('error', function(err){
         OSInformError('SCSS Compile Error', err)
         // .then(()=>gmutil.error(errMessage))
     })
     .pipe(base64({
-        'isAbsolutePath': isAbsolutePath,
-        'relevancyDir': RUNTIME_ASSETS_PATH,
-        'baseDir': RUNTIME_STATIC_PATH,
-        // 'components': COMPONENTS_PATH,
+        'is_absolute': _opts['is_absolute'],
+        'relevancyDir': _opts['runtime_assets'],
+        'baseDir': _opts['runtime_static'],
+        // 'components': _opts['components'],
         'isDevelop': isDevelop,
         'type': 'css',
         'rule': getB64ImgReg()
@@ -316,7 +316,7 @@ function compile_sass(singleFile){
     .on('error', function(err){
         OSInformError('CSS Img-Base64 Error', err)
     })
-    .pipe(gulp.dest(RUNTIME_STATIC_PATH))
+    .pipe(gulp.dest(_opts['runtime_static']))
     // 这里没有复制到static的备份目录
 }
 
@@ -329,7 +329,7 @@ gulp.task('gm:compile-sass', ()=>{
 gulp.task('gm:compile-es6', ()=>{
 
     return gulp.src(es6_source)
-    .pipe(p.babel(babelOpts))
+    .pipe(p.babel(_opts['babel']))
     .on('error', err=>{
         OSInformError('Babel Error', err)
     })
@@ -338,8 +338,8 @@ gulp.task('gm:compile-es6', ()=>{
         // 此处都统一扩展名设置为.es6
         path.extname = '.es6'
     }))
-    .pipe(gulp.dest(RUNTIME_STATIC_TMP_PATH))
-    .pipe(gulp.dest(RUNTIME_STATIC_PATH))
+    .pipe(gulp.dest(_opts['runtime_static_tmp']))
+    .pipe(gulp.dest(_opts['runtime_static']))
 })
 
 
@@ -374,19 +374,16 @@ gulp.task('gm:compile', p.sequence(
  * FOR DEVELOP WATCHT ================================
  */
 
-// utils
-
-
 /**
  * 因为task不能传参，这里用全局变量来实现，
  * 后续考虑优化
  * @type {[type]}
  */
 
-let watch_event = null
+let _g_es6_event = null
 
 function updateES6Compile(event){
-    watch_event = event
+    _g_es6_event = event
     gulp.start('update_browserify')
 }
 
@@ -413,13 +410,13 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         // set assets url prefix
         let _urlPrefix
 
-        if(isAbsolutePath) {
-            _urlPrefix = ASSETS_URL_PREFIX
+        if(_opts['is_absolute']) {
+            _urlPrefix = _opts['url_prefix']
         }else {
             // 判断打包资源中的url路径前缀
-            let _fPath = j(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH, fdirname)
+            let _fPath = j(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views'], fdirname)
 
-            let _staticPath = _isRuntimeDir ? RUNTIME_STATIC_PATH : DIST_STATIC_PATH
+            let _staticPath = _isRuntimeDir ? _opts['runtime_static'] : _opts['dist_static']
 
             _urlPrefix = path.relative(_fPath, _staticPath) 
         }
@@ -453,11 +450,11 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         OSInformError('ParseHtml Error', err)
     })
     .pipe(base64({
-        'isAbsolutePath': isAbsolutePath,
-        'relevancyDir': RUNTIME_ASSETS_PATH,
-        'baseDir': RUNTIME_ASSETS_PATH,
-        'views': _isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH,
-        'dist_assets': DIST_ASSETS_PATH,
+        'is_absolute': _opts['is_absolute'],
+        'relevancyDir': _opts['runtime_assets'],
+        'baseDir': _opts['runtime_assets'],
+        'views': _isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views'],
+        'dist_assets': _opts['dist_assets'],
         'isDevelop': isDevelop,
         'type': 'html',
         'rule': getB64ImgReg()
@@ -465,13 +462,13 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     .on('error', function(err){
         OSInformError('HTML Img-Base64 Error', err)
     })
-    .pipe(gulp.dest(_isRuntimeDir ? RUNTIME_VIEWS_PATH : DIST_VIEWS_PATH))
+    .pipe(gulp.dest(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views']))
 }
 
 
 
 function getRelativePath(epath) {
-    let _tarPath = j(_cwd, COMPONENTS_PATH)
+    let _tarPath = j(_cwd, _opts['components'])
     let relPath = epath.replace(_tarPath, '')
 
     return relPath
@@ -517,12 +514,11 @@ function getTarPath(epath, replaceDir){
 // tasks
 
 gulp.task('update-es6', ()=>{
-    // var event = watch_event,
-    let epath = watch_event.path,
-        etype = watch_event.type
+    let epath = _g_es6_event.path,
+        etype = _g_es6_event.type
 
     return gulp.src(epath)
-    .pipe(p.babel(babelOpts))
+    .pipe(p.babel(_opts['babel']))
     .pipe(p.rename(path=>{
         let relPath = getRelativePath(epath)
 
@@ -535,7 +531,7 @@ gulp.task('update-es6', ()=>{
          * 否则会覆盖正式的static目录中打包后的js文件)
          */
 
-        path.dirname = j(RUNTIME_STATIC_TMP_PATH, relPath)
+        path.dirname = j(_opts['runtime_static_tmp'], relPath)
         path.extname = '.es6'
         
         gmutil.tip('*ES6 File Changed: ' + epath)
@@ -550,15 +546,44 @@ gulp.task('update_browserify', ['update-es6'], ()=>{
 })
 
 
-gulp.task('gm:develop', ['gm:compile'], function(){
+gulp.task('gm:develop', ['gm:compile'], ()=>{
+
+    let _cmdBase = {
+        'component': {
+            '-c': true,
+            '-component': true
+        }
+    }
     
-    var _gulp = this
+    let _how = process.argv[3],
+        _what = process.argv[4]
+
+
+    let _watch_es6_source = es6_source,
+        _watch_css_source = sass_source,
+        _watch_html_source = html_source,
+        _watch_all_raw_source = all_raw_source
+
+
+    if(_how in _cmdBase['component'] && _what){
+
+        gmutil.warn('\n*Watch Component: '+_what)
+        
+        _watch_es6_source = j(_opts['components'], _what, '**/*.{es6,jsx}')
+        _watch_css_source = j(_opts['components'], _what, '**/*.{scss,sass}')
+    
+        _watch_html_source = [j(_opts['components'], _what, '**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')]
+
+        _watch_all_raw_source = j(_opts['components'], _what, '**/*.{'+all_raw_source_type+'}')
+
+    }
+    
 
     gmutil.warn('\n*Source Compiled Succeed. \n*Loading source. Waiting ...\n')
 
 
-    // watch es6\js
-    let js_watcher = gulp.watch(es6_source)
+    // watch es6\js ----------------------------------
+    let js_watcher = gulp.watch(_watch_es6_source)
 
     js_watcher.on('change', event=>{
 
@@ -571,8 +596,8 @@ gulp.task('gm:develop', ['gm:compile'], function(){
                 break
 
             case 'deleted':
-                delChangedFile(event.path, RUNTIME_STATIC_PATH, 'js')
-                delChangedFile(event.path, RUNTIME_STATIC_TMP_PATH, 'js')
+                delChangedFile(event.path, _opts['runtime_static'], 'js')
+                delChangedFile(event.path, _opts['runtime_static_tmp'], 'js')
                 break
 
             default: 
@@ -581,8 +606,8 @@ gulp.task('gm:develop', ['gm:compile'], function(){
     })
 
 
-    // watch scss
-    let css_watcher = gulp.watch(sass_source, ['gm:compile-sass'])
+    // watch scss ----------------------------------
+    let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-sass'])
 
     css_watcher.on('change', event=>{
 
@@ -591,7 +616,7 @@ gulp.task('gm:develop', ['gm:compile'], function(){
             
       switch(event.type){
           case 'deleted':
-              delChangedFile(epath, RUNTIME_STATIC_PATH, 'css')
+              delChangedFile(epath, _opts['runtime_static'], 'css')
               break
       }
 
@@ -600,31 +625,31 @@ gulp.task('gm:develop', ['gm:compile'], function(){
     })
 
 
-    // watch html
-    let html_watcher = gulp.watch(html_source)
+    // watch html --------------------------------------
+    let html_watcher = gulp.watch(_watch_html_source)
 
     html_watcher.on('change', event=>{
         let epath = event.path,
             etype = event.type,
-            f = getTarPath(epath, RUNTIME_VIEWS_PATH)
+            f = getTarPath(epath, _opts['runtime_views'])
 
         
         if(etype == 'changed' || etype == 'added'){
             
             let relPath = getRelativePath(epath)
             
-            let rawHtmlFile = j(COMPONENTS_PATH, relPath)
+            let rawHtmlFile = j(_opts['components'], relPath)
             
-            let basepath = j(_cwd, COMPONENTS_PATH)
+            let basepath = j(_cwd, _opts['components'])
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
 
         }else if(etype == 'deleted'){
 
-            delChangedFile(epath, RUNTIME_VIEWS_PATH)
+            delChangedFile(epath, _opts['runtime_views'])
         }else if(etype == 'renamed'){
 
             let oldPath = event.old,
-                oldf = getTarPath(oldPath, RUNTIME_VIEWS_PATH)            
+                oldf = getTarPath(oldPath, _opts['runtime_views'])            
 
             sh.cp('-rf', epath, f.dirPath)
             sh.rm('-rf', oldf.tarPath)
@@ -638,15 +663,15 @@ gulp.task('gm:develop', ['gm:compile'], function(){
     })
 
 
-    // raw source
-    let raw_watcher = gulp.watch(all_raw_source)
+    // raw source -------------------------------------
+    let raw_watcher = gulp.watch(_watch_all_raw_source)
 
     raw_watcher.on('change', function(event) {
         let epath = event.path,
             file_extname = path.extname(epath),
 
-            f = getTarPath(epath, RUNTIME_STATIC_PATH),
-            tmp_f = getTarPath(epath, RUNTIME_STATIC_TMP_PATH)
+            f = getTarPath(epath, _opts['runtime_static']),
+            tmp_f = getTarPath(epath, _opts['runtime_static_tmp'])
 
         if(event.type == 'added' || event.type == 'changed'){
             sh.cp('-rf', epath, f.dirPath)
@@ -660,14 +685,14 @@ gulp.task('gm:develop', ['gm:compile'], function(){
             // check relevancy images
             if(event.type == 'changed') {
 
-                store.check(epath, RUNTIME_ASSETS_PATH, RUNTIME_STATIC_PATH, COMPONENTS_PATH, 
+                store.check(epath, _opts['runtime_assets'], _opts['runtime_static'], _opts['components'], 
                 {
                     'html': function (rawHtmlFile){
                         // html实现了增量编译base64文件
-                        let basepath = j(_cwd, COMPONENTS_PATH)
+                        let basepath = j(_cwd, _opts['components'])
                         parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
                     },
-                    // css 目前还是普通编译
+                    // raw目录中的scss也实现了增量编译
                     'css': compile_sass
                 })
                 
@@ -684,8 +709,8 @@ gulp.task('gm:develop', ['gm:compile'], function(){
 
         }else if(event.type == 'renamed'){
             let oldPath = event.old,
-                oldf = getTarPath(oldPath, RUNTIME_STATIC_PATH),
-                old_tmpf = getTarPath(oldPath, RUNTIME_STATIC_TMP_PATH)
+                oldf = getTarPath(oldPath, _opts['runtime_static']),
+                old_tmpf = getTarPath(oldPath, _opts['runtime_static_tmp'])
             
             gmutil.tip('Rename Raw File: '+oldf.tarPath)
 
@@ -703,10 +728,10 @@ gulp.task('gm:develop', ['gm:compile'], function(){
         }
     })
     .on('error', err=>{
-        console.log('Error: ', err)
+        gmutil.error('Error: ', err)
     })
 
-    // ready for watch
+    // ready for watch --------------------------------
     gmutil.tip('\n*Now Watching For Development:\n')
      
 })
@@ -718,10 +743,10 @@ gulp.task('gm:develop', ['gm:compile'], function(){
 
 // utils
 function setRevPlace(){
-    let manifest = gulp.src(j(DIST_ASSETS_PATH,'rev-manifest.json'))
+    let manifest = gulp.src(j(_opts['dist_assets'],'rev-manifest.json'))
     return p.revReplace({
         'manifest': manifest,
-        'prefix': cdn_prefix
+        'prefix': _opts['cdn_prefix']
     })
 }
 
@@ -732,7 +757,7 @@ gulp.task('gm:css', ()=>{
     // 除去lib
     return gulp.src([css_source, except_lib_source])
     .pipe(p.cssnano())
-    .pipe(gulp.dest(DIST_STATIC_PATH))
+    .pipe(gulp.dest(_opts['dist_static']))
 })
 
 
@@ -747,7 +772,7 @@ gulp.task('gm:imagemin', ()=>{
         }],
         use: [pngquant()]
     }))
-    .pipe(gulp.dest(DIST_STATIC_PATH))
+    .pipe(gulp.dest(_opts['dist_static']))
 })
 
 
@@ -760,7 +785,7 @@ gulp.task('gm:js', ()=>{
         gmutil.warn('*Passed ...')
         return this
     })
-    .pipe(gulp.dest(DIST_STATIC_PATH))
+    .pipe(gulp.dest(_opts['dist_static']))
 })
 
 
@@ -821,7 +846,7 @@ gulp.task('gm:rev-source', ()=>{
         // 无需关联处理文件  
         dontGlobal: [ /^\/favicon.ico$/, '.txt', '.tpl'],  
         // 该项配置只影响当前src的静态资源中 绝对路径的资源引用地址  
-        prefix: cdn_prefix  
+        prefix: _opts['cdn_prefix']  
     })
 
     return gulp.src(dist_all_raw_source)
@@ -829,12 +854,12 @@ gulp.task('gm:rev-source', ()=>{
     /**
      * 这里因为assets_url的缘故，
      * dist_all_raw_source的路径要不带static,
-     * 否则最终发布的html，assets_url会跑到cdn_prefix前面。
+     * 否则最终发布的html，assets_url会跑到_opts['cdn_prefix']前面。
      */
-    .pipe(gulp.dest(DIST_ASSETS_PATH))
+    .pipe(gulp.dest(_opts['dist_assets']))
     // 输出manifest文件
     .pipe(revAll.manifestFile())
-    .pipe(gulp.dest(DIST_ASSETS_PATH))
+    .pipe(gulp.dest(_opts['dist_assets']))
 
 })
 
@@ -842,7 +867,7 @@ gulp.task('gm:rev-source', ()=>{
 gulp.task('gm:rev-html', ()=>{
     return gulp.src(dist_html_source)
     .pipe(setRevPlace())
-    .pipe(gulp.dest(DIST_VIEWS_PATH))
+    .pipe(gulp.dest(_opts['dist_views']))
 })
 
 
@@ -854,20 +879,20 @@ gulp.task('gm:rev-css', ()=>{
     
     return gulp.src(dist_css_source)
     .pipe(setRevPlace())
-    .pipe(gulp.dest(DIST_STATIC_PATH))
+    .pipe(gulp.dest(_opts['dist_static']))
 })
 
 
 
 // create ../assets_dist
 gulp.task('gm:create-assets-dist-dir', ()=>{
-    sh.mkdir(DIST_ASSETS_PATH)
+    sh.mkdir(_opts['dist_assets'])
 })
 
 gulp.task('gm:copy-pure-source', ()=>{
 
     return gulp.src([pure_source, except_lib_source])
-    .pipe(gulp.dest(DIST_STATIC_PATH))
+    .pipe(gulp.dest(_opts['dist_static']))
 })
 
 // for compile publish
@@ -877,8 +902,8 @@ gulp.task('gm:copy', [
     'gm:publish-html'
 ],()=>{
     // 从 runtime的views目录内容，拷贝到dist的views目录
-    // return gulp.src(j(RUNTIME_VIEWS_PATH, '**/*.*'))
-    // .pipe(gulp.dest(DIST_VIEWS_PATH))
+    // return gulp.src(j(_opts['runtime_views'], '**/*.*'))
+    // .pipe(gulp.dest(_opts['dist_views']))
 })
 
 //set Mode in Publish
@@ -906,10 +931,10 @@ gulp.task('gm:generate-config', ()=>{
 })
 
 
-gulp.task('gm:generate-components-dir', ()=>{
+gulp.task('gm:generate-components', ()=>{
     // create componetns dir
     // May invalid for windows
-    sh.exec('mkdir '+COMPONENTS_PATH+' >& /dev/null')
+    sh.exec('mkdir '+_opts['components']+' >& /dev/null')
 })
 
 
@@ -919,7 +944,7 @@ gulp.task('gm:generate-lib', ()=>{
     let prelib_path = j(__dirname ,'./presetlib/**/*.*')
 
     return gulp.src(prelib_path)
-    .pipe(gulp.dest(j(COMPONENTS_PATH, lib_dir)))
+    .pipe(gulp.dest(j(_opts['components'], _opts['lib'])))
 })
 
 
@@ -929,51 +954,40 @@ gulp.task('gm:generate-meta', ()=>{
     let meta_path = j(__dirname ,'./meta/**/*.*')
 
     return gulp.src(meta_path)
-    .pipe(gulp.dest(COMPONENTS_PATH))
+    .pipe(gulp.dest(_opts['components']))
 })
 
+
+gulp.task('gm:open-demo', ()=>{
+    sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+' >& /dev/null')
+})
+
+// init the proj
 gulp.task('gm:init', p.sequence(
     'gm:clean',
-    'gm:generate-components-dir', 
+    'gm:generate-components', 
     ['gm:generate-meta', 'gm:generate-lib'],
     // 'gm:generate-config',
-    'gm:compile'
+    'gm:compile',
+    'gm:open-demo'
 ))
 
 
-// API ============================
+// API ================================
 
 // config the dir
 exports['config'] = function(opts){
 
-    opts['is_absolute'] !== undefined && (isAbsolutePath = opts['is_absolute'])
+    Object.assign(_opts, opts)
+    initVars()
 
-    // gmutil.error('ttt*: '+opts['is_absolute'])
-    // gmutil.error('isAbsolutePath: '+isAbsolutePath)
-    // console.log(isAbsolutePath)
-
-    opts['cdn_prefix'] && (cdn_prefix =  opts['cdn_prefix'])
-
-    opts['url_prefix'] && (ASSETS_URL_PREFIX = opts['url_prefix'])
-
-    opts['components'] && (COMPONENTS_PATH = opts['components'])
-
-    opts['runtime_views'] && (RUNTIME_VIEWS_PATH = opts['runtime_views'])
-
-    opts['dist_views'] && (DIST_VIEWS_PATH = opts['dist_views'])
-
-
-    opts['runtime_assets'] && (RUNTIME_ASSETS_PATH = opts['runtime_assets'])
-
-    opts['dist_assets'] && (DIST_ASSETS_PATH = opts['dist_assets'])
-
-    // the js lib dir
-    opts['lib'] && (lib_dir = opts['lib'])
-
-    // global module
-    opts['global'] && (global_module = opts['global_module'])
-
-    resetVars()
-
+    return _opts
 }
+
+// return the _opts
+exports['getConfig'] = function(){
+
+    return _opts
+}
+
 

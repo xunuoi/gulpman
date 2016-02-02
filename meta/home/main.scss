@@ -17,10 +17,28 @@
     }
 }
 
+.more-info {
+    margin-top: 20px;
+    border: 1px dashed #8EB139;
+    padding: 20px;
+    background-color: #FFAA89;
+    border-radius: 8px;
+
+    h3 {
+        color: white;
+    }
+    a {
+        text-decoration: none;
+    }
+    ul li {
+        line-height: 30px;
+    }
+}
+
 .demo-container {
     margin-top: 30px;
     border: 1px dashed #8EB139;
-    padding: 30px;
+    padding: 20px;
     background-color: #5B9EB2;
     border-radius: 8px;
 
