@@ -11,9 +11,9 @@
 # gulpman
 
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- 基于gulp的前端模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
+- 基于gulp的前端组件化、模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 支持图片base64方式嵌入到html/CSS
-- 集成`SCSS|ES6|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
+- 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
 - 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
 
 
@@ -90,7 +90,7 @@ gman.config({
     'dist_assets': 'assets_dist',
 
     // 第三方JS类库、模块的目录，推荐设置为`lib`或`bower_components`（这样bower可以直接安装到这个目录）
-    // 这个目录默认打包时为全局模块目录，可以直接`require('xxx')`，而不用加相对路径
+    // 这个目录默认打包时为全局模块目录，可以直接`import xxx from 'xxx'`，而不用加相对路径
     // the js library dir, set as a global module. Also you can set as bower_components
     'lib': 'lib', 
 
@@ -104,7 +104,7 @@ gman.config({
 
 ####对于is_absolute的说明：
 
-* is_absolute是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
+* `is_absolute`是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
 
 * [常用]当使用服务器配置静态目录的情况下，推荐使用绝对目录。比如配合nginx，指定某个目录为静态资源目录。类似`/static/home/main.js`这种风格。
 
@@ -184,7 +184,7 @@ import 'react'
 
 ####什么是全局模块目录：
 
-- gulpman.config的配置中，lib和global都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+- `gulpman.config`的配置中，`lib`和`global`都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
 - 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
 - 注意全局模块不要有同名冲突。
 
@@ -192,7 +192,7 @@ import 'react'
 ####如何嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?base64=true`即可
-* 打包时候会将图片生成base64编码替换到到html中
+* 打包时候会将图片生成`base64`编码替换到到html中
 
 
 #####对于html
