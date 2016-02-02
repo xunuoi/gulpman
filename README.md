@@ -140,11 +140,16 @@ gulpman.config({
 # init components dir and a html demo
 gulp gm:init
 
-# publish 发布资源，包括合并、压缩资源、rev产生MD5等
-gulp gm:publish
 
 # develop and watch 开发模式，监视相关文件变动，增量更新
 gulp gm:develop
+
+# 指定监视某个component, 提高性能和效率
+gulp gm:develop -c component_name
+
+
+# publish 发布资源，包括合并、压缩资源、rev产生MD5等
+gulp gm:publish
 
 # clean 清理构建输出的目录和文件
 gulp gm:clean
@@ -153,8 +158,17 @@ gulp gm:clean
 # compile for develop, not watch
 gulp gm:compile
 
+```
+
+####只监视某个component目录来开发：
+* 比如说，只监视components目录下的home模块
+* 
+```Shell
+
+gulp gm:develop -c home
 
 ```
+
 
 ####如何使用React ? How to use ReactJS in Gulpman ?
 
