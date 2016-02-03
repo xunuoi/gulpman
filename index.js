@@ -934,7 +934,7 @@ gulp.task('gm:generate-config', ()=>{
 gulp.task('gm:generate-components', ()=>{
     // create componetns dir
     // May invalid for windows
-    sh.exec('mkdir '+_opts['components']+' >& /dev/null')
+    sh.exec('mkdir '+_opts['components']+' >/dev/null 2>&1')
 })
 
 
@@ -959,7 +959,7 @@ gulp.task('gm:generate-meta', ()=>{
 
 
 gulp.task('gm:open-demo', ()=>{
-    sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+' >& /dev/null')
+    sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+' >/dev/null 2>&1')
 })
 
 // init the proj

@@ -2,7 +2,7 @@
 
 echo "\n\n*Check whether the gulp is installed in global:"
 
-gulp -v >& /dev/null
+gulp -v >/dev/null 2>&1
 
 if [ $? -eq 0 ];then
     echo "\n*gulp has been installed"
@@ -14,7 +14,7 @@ fi
 
 echo "\n\n*Check whether the cnpm is installed:"
 
-cnpm >& /dev/null
+cnpm >/dev/null 2>&1
 
 if [ $? -eq 0 ];then
     echo "\n*cnpm has been installed"
