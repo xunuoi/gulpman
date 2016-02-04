@@ -1,3 +1,9 @@
+/**
+ * Gulpman demo gulpfile.js
+ * Config the gulpman by yourself
+ */
+
+
 var gulp = require('gulp'),
     gulpman = require('gulpman')
 
@@ -7,7 +13,7 @@ gulpman.config({
 
     // 是否启用资源绝对路径
     // if set the `is_absolute` as false, then the url of source may be like '../assets/static/home/logo.png'
-    // 'is_absolute': false // default is true
+    'is_absolute': false // default is true
     
 
     // cdn prefix 配置CDN域名前缀

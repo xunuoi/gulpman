@@ -210,14 +210,15 @@ import 'react'
 * 打包时候会将图片生成`base64`编码替换到到html中
 
 
-#####对于html
+#####html
+
 ```html
 <p class="play"> 
     <img width="480" alt="Karat 克拉" src="./img/testb64.png?_gm_inline" />
 </p>
 ```
 
-#####对于CSS/SCSS
+#####CSS/SCSS
 
 ```css
 
@@ -233,7 +234,7 @@ import 'react'
 ```html
 <script src="./plugin.js?_gm_inline" type="text/javascript"></script>
 
-<link rel="stylesheet" type="text/css" href="./dialog.css?_gm_inline">
+<link href="./dialog.css?_gm_inline" rel="stylesheet" type="text/css" >
 ```
 
 
