@@ -206,14 +206,14 @@ import 'react'
 
 ####如何嵌入base64编码的图片
 
-* 只需要图片资源后面添加`?base64=true`即可
+* 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
 
 
 #####对于html
 ```html
 <p class="play"> 
-    <img width="480" alt="Karat 克拉" src="./img/testb64.png?base64=true" />
+    <img width="480" alt="Karat 克拉" src="./img/testb64.png?_gm_inline" />
 </p>
 ```
 
@@ -222,8 +222,18 @@ import 'react'
 ```css
 
 .test {
-    background: url(./img/testb64.png?base64=true) no-repeat;
+    background: url(./img/testb64.png?_gm_inline) no-repeat;
 }
+```
+
+####如何在HTML中嵌入内联CSS/Javascript
+
+* 类似图片base64,只需要资源后面添加`?_gm_inline`即可
+
+```html
+<script src="./plugin.js?_gm_inline" type="text/javascript"></script>
+
+<link rel="stylesheet" type="text/css" href="./dialog.css?_gm_inline">
 ```
 
 

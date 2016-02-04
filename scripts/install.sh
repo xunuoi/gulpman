@@ -38,7 +38,7 @@ script_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 gulpfile_src="gulp/gulpfile.js"
 
-gulpfile_path="./gulpfile.js"
+gulpfile_path="../../gulpfile.js"
 
 
 if [ ! -f "$gulpfile_path" ]; then

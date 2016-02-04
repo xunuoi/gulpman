@@ -28,7 +28,8 @@ let gulp = require('gulp'),
     // gulpman utils
     gmutil = require('./lib/gmutil'),
     base64 = require('./lib/base64'),
-    store = require('./lib/store')
+    store = require('./lib/store'),
+    htmlInline = require('./lib/inline')
 
 /**
  * *** FOR GULPER ***
@@ -100,7 +101,7 @@ const base_source_type = 'js,css',
     pure_source_type = [font_source_type, other_source_type ].join(),
     // all raw source
     all_raw_source_type = [base_source_type, img_source_type, font_source_type, other_source_type].join(),
-    type_pt_str = all_raw_source_type.split(',').join('|')
+    all_raw_source_reg = all_raw_source_type.split(',').join('|')
 
 
 // uncompiled source =====================================
@@ -198,7 +199,7 @@ function OSInformError(title, err, cb){
 
 
 function getB64ImgReg(){
-    return new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+img_source_reg+')))(\\?base64\\=true)(?=[\'"]?)', 'gm')
+    return new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+img_source_reg+')))(\\?_gm_inline)(?=[\'"]?)', 'gm')
 }
 
 
@@ -424,22 +425,28 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
 
         let contents = file.contents.toString()
         
-        let src_pt = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+type_pt_str+')))(?=\\?base64\\=true)*(?=[\'"]?)', 'gm')
+        // 所有格式都要处理
+        let src_pt = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+all_raw_source_reg+')))(?=\\?_gm_inline)?(?=[\'"]?)', 'gm')
 
         let tmp_rs_list = contents.match(src_pt), rs_list = null
 
         tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
 
+        // 这里做数组去重
+        rs_list = Array.from(new Set(rs_list))
+        // gmutil.warn('list: ', rs_list)
         // 对于匹配的url选项，比如./img/demo.png，进行循环处理
         rs_list && rs_list.forEach(epath=>{
 
             // 对于base64的参数标识要保留，不能清理掉，因为后续要嵌入base64
-            let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?base64\\=true)*(?=[\'"]?)', 'gm')
+            let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?_gm_inline)*(?=[\'"]?)', 'gm')
 
             contents = contents.replace(innerReg, j(_urlPrefix, fdirname, epath)+'$2')
         })
 
         file.contents = new Buffer(contents)
+
+        // gmutil.warn(contents)
         this.push(file)
 
         gmutil.tip('*Raw HTML File Parsed: '+file.relative)
@@ -462,6 +469,21 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     .on('error', function(err){
         OSInformError('HTML Img-Base64 Error', err)
     })
+    .pipe(htmlInline({
+
+        'is_runtime': _isRuntimeDir,
+        'absoluteRoot': _opts['is_absolute'] ? (_isRuntimeDir ? _opts['runtime_assets'] :  _opts['dist_assets']) : false,
+
+        queryKey: '_gm_inline',
+        minifyCss: _isRuntimeDir ? false : true, // 选择是否压缩css
+        minifyJs: _isRuntimeDir ? false : true,  // 选择是否压缩js,
+
+        'dist_dir': _opts['dist_assets'],
+        'runtime_dir': _opts['runtime_assets'],
+
+        'root': _cwd
+        // basePath: _opts['runtime_assets']
+    }))
     .pipe(gulp.dest(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views']))
 }
 
