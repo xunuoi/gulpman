@@ -35,6 +35,10 @@ cd into your project dir and install:
 
 ##Config 配置
 
+###0. 支持傻瓜模式，无需配置即使用
+
+* 可直接跳过`Config 配置`处的说明，直接去看`Usage 使用`
+
 
 ###1. 配置 gulpfile.js:
 
