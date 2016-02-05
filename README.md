@@ -71,7 +71,7 @@ gman.config({
     'is_absolute': true,
 
     // cdn prefix 配置CDN
-    'cdn_prefix': '', 
+    'cdn_prefix': '', // 支持 字符串/数组/函数
 
     // 配置资源URL前缀，建议 /xxx这种
     // usually set as /static, this involves the server config ,such as the static path of nginx
@@ -100,6 +100,37 @@ gman.config({
 })
 
 
+```
+
+####如何更好配置CDN
+
+* `cdn_prefix`支持 字符串、数组、函数
+* 如果传入数组，那么按照随机来分配
+* 如果传入函数，函数会获得两个参数，mediaFile和hostFile
+* hostFile是当前正在处理的html/CSS文件
+* mediaFile是指在hostFile中被引用的资源文件
+
+```Javascript
+
+'cdn_prefix': function (mediaFile, hostFile) {
+        
+        gulpman.util.warn(mediaFile)
+        gulpman.util.warn(hostFile)
+
+        var c_list = [
+            'http://s0.com', 
+            'http://s1.com', 
+            'http://s2.com', 
+            'http://s3.com',
+            'http://s4.com'
+        ]
+        // 你自可以自实现分配策略
+        if(hostFile.match(/\.html$/gm)){
+            return c_list[0]
+        }else {
+            return c_list[1]
+        }
+    },
 ```
 
 ####对于is_absolute的说明：

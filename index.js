@@ -29,7 +29,8 @@ let gulp = require('gulp'),
     gmutil = require('./lib/gmutil'),
     base64 = require('./lib/base64'),
     store = require('./lib/store'),
-    htmlInline = require('./lib/inline')
+    htmlInline = require('./lib/inline'),
+    revReplace = require('./lib/revReplace')
 
 /**
  * *** FOR GULPER ***
@@ -55,7 +56,8 @@ let gulp = require('gulp'),
 
 
 // define base vars ========================================
-let isDevelop = true
+let isDevelop = true,
+    isWatching = false
 
 // get the cwd
 const _cwd = process.cwd()
@@ -262,6 +264,30 @@ function do_browserify(){
 }
 
 
+// get handler for relevancy update
+function getRelevancyHandler() {
+    return {
+        'html': function (rawHtmlFile){
+            // html实现了增量编译base64文件
+            let basepath = j(_cwd, _opts['components'])
+            parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
+        },
+        // 目前只有raw目录中的scss实现了增量编译
+        'css': compile_sass
+    }
+}
+
+
+// wrap the store check fn
+function storeCheck(filepath){
+    return store.check(
+        filepath, 
+        _opts['runtime_assets'], 
+        getRelevancyHandler()
+    )
+}
+
+
 // Main Tasks =====================================
 
 gulp.task('gm:clean', ()=>{
@@ -318,6 +344,17 @@ function compile_sass(singleFile){
         OSInformError('CSS Img-Base64 Error', err)
     })
     .pipe(gulp.dest(_opts['runtime_static']))
+    .pipe(through.obj((file, enc ,next)=>{
+
+        if(isWatching){
+            gmutil.tip('*Relevancy Source: '+file.path)
+
+            storeCheck(file.path)
+
+        } 
+
+        return next()
+    }))
     // 这里没有复制到static的备份目录
 }
 
@@ -479,6 +516,7 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         minifyJs: _isRuntimeDir ? false : true,  // 选择是否压缩js,
 
         'dist_dir': _opts['dist_assets'],
+        // 这个也是relevancyDir
         'runtime_dir': _opts['runtime_assets'],
 
         'root': _cwd
@@ -707,17 +745,10 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
             // check relevancy images
             if(event.type == 'changed') {
 
-                store.check(epath, _opts['runtime_assets'], _opts['runtime_static'], _opts['components'], 
-                {
-                    'html': function (rawHtmlFile){
-                        // html实现了增量编译base64文件
-                        let basepath = j(_cwd, _opts['components'])
-                        parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
-                    },
-                    // raw目录中的scss也实现了增量编译
-                    'css': compile_sass
-                })
-                
+                // img ,eg.
+                let filePath = gmutil.pathInAssets(_cwd, epath, _opts['components'], _opts['runtime_static'])
+
+                storeCheck(filePath)
                 
             }
             
@@ -754,6 +785,8 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
     })
 
     // ready for watch --------------------------------
+    isWatching = true
+
     gmutil.tip('\n*Now Watching For Development:\n')
      
 })
@@ -764,11 +797,15 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
  */
 
 // utils
-function setRevPlace(){
+function setRevReplace(){
+
+    // gmutil.error('cdn: ', _opts['cdn_prefix'])
+
     let manifest = gulp.src(j(_opts['dist_assets'],'rev-manifest.json'))
-    return p.revReplace({
+    return revReplace({
         'manifest': manifest,
-        'prefix': _opts['cdn_prefix']
+        // 如果is_absolute为false, 那么不启用cdn_prefix
+        'prefix': _opts['is_absolute'] ? _opts['cdn_prefix'] : ''
     })
 }
 
@@ -868,7 +905,7 @@ gulp.task('gm:rev-source', ()=>{
         // 无需关联处理文件  
         dontGlobal: [ /^\/favicon.ico$/, '.txt', '.tpl'],  
         // 该项配置只影响当前src的静态资源中 绝对路径的资源引用地址  
-        prefix: _opts['cdn_prefix']  
+        // prefix: _opts['is_absolute'] ? _opts['cdn_prefix'] : '' 
     })
 
     return gulp.src(dist_all_raw_source)
@@ -888,7 +925,7 @@ gulp.task('gm:rev-source', ()=>{
 
 gulp.task('gm:rev-html', ()=>{
     return gulp.src(dist_html_source)
-    .pipe(setRevPlace())
+    .pipe(setRevReplace())
     .pipe(gulp.dest(_opts['dist_views']))
 })
 
@@ -900,7 +937,7 @@ gulp.task('gm:rev-css', ()=>{
      */
     
     return gulp.src(dist_css_source)
-    .pipe(setRevPlace())
+    .pipe(setRevReplace())
     .pipe(gulp.dest(_opts['dist_static']))
 })
 
@@ -1011,5 +1048,7 @@ exports['getConfig'] = function(){
 
     return _opts
 }
+
+exports['util'] = gmutil
 
 
