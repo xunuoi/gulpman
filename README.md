@@ -22,7 +22,7 @@
 ##Introduction 说明
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装`gulp-sass`等模块
-- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，直接修改源码`index.js`中的语法即可，修改为ES5语法就能正常使用
+- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语法
 
 
 ##Install 安装
