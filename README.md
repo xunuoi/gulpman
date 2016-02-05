@@ -34,7 +34,7 @@ cd into your project dir and install:
 ###Usage 使用
 
 
-####In Your Gulpfile:
+####1. In Your Gulpfile:
 
 - 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
 - 使用时在命令行中直接输入`gulp gm:publish`即可执行gulpman预置的任务
@@ -102,13 +102,13 @@ gman.config({
 
 ```
 
-####如何更好配置CDN
+####2. 如何更好的配置CDN
 
 * `cdn_prefix`支持 字符串、数组、函数
 * 如果传入数组，那么按照随机来分配
-* 如果传入函数，函数会获得两个参数，mediaFile和hostFile
-* hostFile是当前正在处理的html/CSS文件
-* mediaFile是指在hostFile中被引用的资源文件
+* 如果传入函数，函数会获得两个参数，`mediaFile`和`hostFile`
+* `hostFile`是当前正在处理的html/CSS文件
+* `mediaFile`是指在`hostFile`中被引用的资源文件
 
 ```Javascript
 
@@ -133,7 +133,7 @@ gman.config({
     },
 ```
 
-####对于is_absolute的说明：
+####3. 对于is_absolute的说明
 
 * `is_absolute`是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
 
@@ -145,7 +145,7 @@ gman.config({
 
 
 
-####支持复杂目录和多级目录设定:
+####4. 支持复杂目录和多级目录设定
 
 * 比如下面这种复杂路径：
 
@@ -163,7 +163,7 @@ gulpman.config({
 
 
 
-####CLI 执行Task:
+####5. CLI 执行Task:
 
 ```Shell
 
@@ -191,18 +191,8 @@ gulp gm:compile
 
 ```
 
-####只监视某个component目录来开发：
 
-* 比如说，只监视components目录下的home模块
-
-```Shell
-
-gulp gm:develop -c home
-
-```
-
-
-####如何使用React ? How to use ReactJS in Gulpman ?
+####5. 如何在gulpman架构下使用React？
 
 * 方法一：通过script标签引入React类库到HTML (推荐)
 
@@ -221,21 +211,39 @@ import 'react'
 
 
 
-####目录说明
+####6. gulpman目录说明
 
 * 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
-* 通过`gm:publish`命令构建后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
+* 通过`gm:develop`命令进入`develop`开发模式后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
+* 通过`gm:publish`命令来构建发布资源，会自动生成生产环境下的模板目录`views_dist`，和静态资源目录`assets_dist`。
 
 
 
-####什么是全局模块目录：
+####7. 开发中只监视某个component目录
 
-- `gulpman.config`的配置中，`lib`和`global`都是全局模块目录。举个例子说明：你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+* 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
+* 比如说，只监视components目录下的home模块：
+
+```Shell
+
+gulp gm:develop -c home
+
+```
+
+
+####8. 什么是全局模块目录：
+
+- `gulpman.config`的配置中，`lib`和`global`都是JS的全局模块目录。举个例子说明：
+* 你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+
 - 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
+
 - 注意全局模块不要有同名冲突。
 
 
-####如何在HTML/CSS中嵌入base64编码的图片
+####9. 如何在HTML/CSS中嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
@@ -258,7 +266,7 @@ import 'react'
 }
 ```
 
-####如何在HTML中嵌入内联CSS/Javascript
+####10. 如何在HTML中嵌入内联CSS/JS
 
 * 类似图片base64,只需要资源后面添加`?_gm_inline`即可
 
