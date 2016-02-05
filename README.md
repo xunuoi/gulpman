@@ -235,7 +235,7 @@ import 'react'
 - 注意全局模块不要有同名冲突。
 
 
-####如何嵌入base64编码的图片
+####如何在HTML/CSS中嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
@@ -268,6 +268,7 @@ import 'react'
 <link href="./dialog.css?_gm_inline" rel="stylesheet" type="text/css" >
 ```
 
+* 注：所有内嵌嵌入的资源，包括图片/JS/CSS，在develop(监视)模式下，都已自动关联更新。即如果a.html文件中，内联嵌入了一个b.css，如果b.css发生了修改，那么a.html会自动编译更新。
 
 
 ###教程
