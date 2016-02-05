@@ -13,28 +13,29 @@
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
 - 基于gulp的前端组件化、模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 支持图片base64方式嵌入到html/CSS
+- 支持JS/CSS内联方式嵌入html文件
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
 - 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
 
 
 
-###Introduction 说明
+##Introduction 说明
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做测试，由于安装脚本使用到shell，windows不支持sh，可能需要手动安装`gulp-sass`等模块
 - Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，直接修改源码`index.js`中的语法即可，修改为ES5语法就能正常使用
 
 
-###Install 安装
+##Install 安装
 cd into your project dir and install:
 
 `npm install gulpman --save-dev`
 
 
 
-###Usage 使用
+##Config 配置
 
 
-####1. In Your Gulpfile:
+###1. 配置 gulpfile.js:
 
 - 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
 - 使用时在命令行中直接输入`gulp gm:publish`即可执行gulpman预置的任务
@@ -102,7 +103,7 @@ gman.config({
 
 ```
 
-####2. 如何更好的配置CDN
+###2. 如何更好的配置CDN
 
 * `cdn_prefix`支持 字符串、数组、函数
 * 如果传入数组，那么按照随机来分配
@@ -133,7 +134,7 @@ gman.config({
     },
 ```
 
-####3. 对于is_absolute的说明
+###3. 对于`is_absolute`的说明
 
 * `is_absolute`是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
 
@@ -145,7 +146,28 @@ gman.config({
 
 
 
-####4. 支持复杂目录和多级目录设定
+###4. gulpman目录说明
+
+* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
+
+* 通过`gm:develop`命令进入`develop`开发模式后，会自动生成模板`views`目录，和静态资源`assets`目录。
+
+* 通过`gm:publish`命令来构建发布资源，会自动生成生产环境下的模板目录`views_dist`，和静态资源目录`assets_dist`。
+
+
+###5. 什么是全局模块目录：
+
+- 对应`Browserify`的打包功能，`全局目录`是指可以直接`require`或者`import`其下的js模块的目录
+
+- `gulpman.config`的配置中，`lib`和`global`都是JS的全局模块目录。举个例子说明：
+* 你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
+
+- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
+
+- 注意全局模块不要有同名冲突。
+
+
+###6. 支持复杂目录和多级目录设定
 
 * 比如下面这种复杂路径：
 
@@ -162,8 +184,9 @@ gulpman.config({
 ```
 
 
+##Usage 使用
 
-####5. CLI 执行Task:
+###1. CLI 执行Task:
 
 ```Shell
 
@@ -192,7 +215,7 @@ gulp gm:compile
 ```
 
 
-####5. 如何在gulpman架构下使用React？
+###2. 如何在gulpman架构下使用React
 
 * 方法一：通过script标签引入React类库到HTML (推荐)
 
@@ -211,19 +234,10 @@ import 'react'
 
 
 
-####6. gulpman目录说明
-
-* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
-
-* 通过`gm:develop`命令进入`develop`开发模式后，会自动生成模板`views`目录，和静态资源`assets`目录。
-
-* 通过`gm:publish`命令来构建发布资源，会自动生成生产环境下的模板目录`views_dist`，和静态资源目录`assets_dist`。
-
-
-
-####7. 开发中只监视某个component目录
+###3. 开发中只监视某个component目录
 
 * 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
+
 * 比如说，只监视components目录下的home模块：
 
 ```Shell
@@ -233,17 +247,7 @@ gulp gm:develop -c home
 ```
 
 
-####8. 什么是全局模块目录：
-
-- `gulpman.config`的配置中，`lib`和`global`都是JS的全局模块目录。举个例子说明：
-* 你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
-
-- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
-
-- 注意全局模块不要有同名冲突。
-
-
-####9. 如何在HTML/CSS中嵌入base64编码的图片
+###4. 如何在HTML/CSS中嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
@@ -266,7 +270,7 @@ gulp gm:develop -c home
 }
 ```
 
-####10. 如何在HTML中嵌入内联CSS/JS
+###5. 如何在HTML中嵌入内联CSS/JS
 
 * 类似图片base64,只需要资源后面添加`?_gm_inline`即可
 
