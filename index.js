@@ -983,6 +983,30 @@ gulp.task('gm:copy', [
 
 //set Mode in Publish
 gulp.task('gm:publish-mode', ()=>{
+    
+    let args = process.argv.slice(3),
+        r = {}
+
+    // 如果在CLI指定了输出目录
+    if(args.length){ 
+
+        args.forEach((v,i)=>i%2 == 0 && (r[v] = args[i+1]))
+
+        let _dist_views = r['-v'] || r['-views']
+
+        let _dist_assets = r['-a'] || r['-assets']
+
+        gmutil.warn('*Dist Path Config\n*dist_assets: '+(_dist_assets || '@config')+'\n*dist_views: '+(_dist_views || '@config'));
+
+
+        (_dist_assets || _dist_views) && updateConf(gmutil.validateObj({
+            'dist_assets': _dist_assets,
+            'dist_views': _dist_views
+        }))
+
+    }
+
+
     isDevelop = false
 })
 
@@ -1051,13 +1075,15 @@ gulp.task('gm:init', p.sequence(
 // API ================================
 
 // config the dir
-exports['config'] = function(opts){
+function updateConf(opts){
 
     Object.assign(_opts, opts)
     initVars()
 
     return _opts
 }
+
+exports['config'] = updateConf
 
 // return the _opts
 exports['getConfig'] = function(){
