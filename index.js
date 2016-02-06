@@ -463,17 +463,33 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         let contents = file.contents.toString()
         
         // 所有格式都要处理
-        let src_pt = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+all_raw_source_reg+')))(?=\\?_gm_inline)?(?=[\'"]?)', 'gm')
+        let srcQuoteReg = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+all_raw_source_reg+')))(?=\\?_gm_inline)?(?=[\'"]?)', 'gm')
 
-        let tmp_rs_list = contents.match(src_pt), rs_list = null
 
-        tmp_rs_list && (rs_list = tmp_rs_list.filter(r=>!r.match(/^(['"]\/)/gm)))
+        let tmp_rs_list = [],
+            rs_list = []
 
-        // 这里做数组去重
-        rs_list = Array.from(new Set(rs_list))
-        // gmutil.warn('list: ', rs_list)
-        // 对于匹配的url选项，比如./img/demo.png，进行循环处理
-        rs_list && rs_list.forEach(epath=>{
+        // 提取单标签和双标签
+        tmp_rs_list = tmp_rs_list
+            .concat(contents.match(gmutil.reg['tagMedia']))
+            .concat(contents.match(gmutil.reg['closeTagMedia']))
+
+        // gmutil.error(tmp_rs_list)
+            
+        // 首先提取标签，然后从标签中提取href或者src
+        tmp_rs_list.length && (
+            rs_list = tmp_rs_list
+            .filter(r=>r.match(srcQuoteReg))
+            .map(v=>v.match(srcQuoteReg)[0])
+            .filter(r=>!r.match(/^(['"]\/)/gm))
+        )
+        
+
+        // 这里利用set做去重
+        let rs_set = new Set(rs_list)
+
+        // 替换url的的path和前缀
+        rs_set.size && rs_set.forEach(epath=>{
 
             // 对于base64的参数标识要保留，不能清理掉，因为后续要嵌入base64
             let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?_gm_inline)*(?=[\'"]?)', 'gm')
