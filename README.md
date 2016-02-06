@@ -210,8 +210,8 @@ gulp gm:develop -c component_name
 # publish 发布资源，包括合并、压缩资源、rev产生MD5等
 gulp gm:publish
 
-# publish命令支持`-a`和`-v`参数指定输出资源/模板目录
-gulp gm:publish [-v views_dist] [-a assets_dist]
+# publish命令支持`-a`和`-v`参数指定输出资源/模板目录(可选)
+gulp gm:publish -v your_views_dist -a your_assets_dist
 
 # clean 清理构建输出的目录和文件
 gulp gm:clean
