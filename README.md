@@ -27,9 +27,11 @@
 
 
 ##Install 安装
-cd into your project dir and install:
+* cd into your project dir and install:
 
 `npm install gulpman --save-dev`
+* 安装中若出现目录权限导致的error，比如`/usr/local/lib/node_modules`若有涉及到报错，请请检查其权限是否正常并用chown来修复，拥有者修改为当前登录用户即可。
+* 不要使用`sudo npm install`来手工安装因为权限而失败的模块。请修改权限后，再用`npm install`来安装即可
 
 
 
