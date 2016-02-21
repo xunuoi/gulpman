@@ -8,8 +8,11 @@ if [ $? -eq 0 ];then
     echo "\n*gulp has been installed"
 else
     echo "\n*gulp not installed, now install gulp"
-    npm install gulp
+    npm install gulp -g
 fi
+
+# install gulp in local 
+npm install gulp --save-dev
 
 
 echo "\n\n*Check whether the cnpm is installed:"
