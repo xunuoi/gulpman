@@ -11,8 +11,9 @@ else
     npm install gulp -g
 fi
 
-# install gulp in local 
+# install gulp in local
 npm install gulp --save-dev
+echo "\n*Install local gulp Completed!\n"
 
 
 echo "\n\n*Check whether the cnpm is installed:"
