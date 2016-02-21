@@ -7,8 +7,8 @@ gulp -v >/dev/null 2>&1
 if [ $? -eq 0 ];then
     echo "\n*gulp has been installed"
 else
-    echo "\n*gulp not installed, now install gulp -g"
-    npm install gulp -g
+    echo "\n*gulp not installed, now install gulp"
+    npm install gulp
 fi
 
 
