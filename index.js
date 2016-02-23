@@ -30,7 +30,10 @@ let gulp = require('gulp'),
     base64 = require('./lib/base64'),
     store = require('./lib/store'),
     htmlInline = require('./lib/inline'),
-    revReplace = require('./lib/revReplace')
+    revReplace = require('./lib/revReplace'),
+
+    // css spriter
+    spriter = require('./lib/spriter')
 
 /**
  * *** FOR GULPER ***
@@ -61,6 +64,7 @@ let isDevelop = true,
 
 // get the cwd
 const _cwd = process.cwd()
+const _echo_off = ' >/dev/null 2>&1'
 
 let _opts = {
 
@@ -119,7 +123,10 @@ let sass_source,
     lib_source,
     except_lib_source,
 
+
     dist_lib_path,
+    dist_except_lib_path,
+
     css_source,
     img_source,
     pure_source,
@@ -150,9 +157,10 @@ function initVars(){
     // to-be-published source ================================
     js_source = j(_opts['runtime_static'], '**/*.js')
     lib_source = j(_opts['runtime_static'], _opts['lib'], '**/*.*')
-    except_lib_source = '!'+lib_source
+    except_lib_source = '!' + lib_source
 
     dist_lib_path = j(_opts['dist_static'], _opts['lib'])
+    dist_except_lib_path = '!' + dist_lib_path
     css_source = j(_opts['runtime_static'], '**/*.css')
     img_source = j(_opts['runtime_static'],'**/*.{'+img_source_type+'}')
     pure_source = j(_opts['runtime_static'], '**/*.{'+pure_source_type+'}')
@@ -363,6 +371,36 @@ gulp.task('gm:compile-sass', ()=>{
     return compile_sass()
 })
 
+gulp.task('gm:compile-sprite', ['gm:compile-sass'], ()=>{
+
+    let files = globby.sync([css_source, except_lib_source]),
+        tasks = files.map((entry)=>{
+
+            // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
+
+            // console.log('entry: '+entry)
+            return gulp.src(entry)
+            .pipe(spriter({
+                    'cwd': _cwd,
+                    // 'includeMode': 'explicit',
+                // The path and file name of where we will save the sprite sheet
+                    'dist_root': _opts['runtime_static'],
+                    // 'spriteSheet': j(_opts['dist_static'],'sprite_sheet.png'),
+                    // Because we don't know where you will end up saving the CSS file at this point in the pipe,
+                    // we need a litle help identifying where it will be.
+                    // 'pathToSpriteSheetFromCSS': '../sprite_sheet.png'
+            }))
+            /*.pipe(p.rename(path=>{
+                console.log(path)
+            }))*/
+            .pipe(gulp.dest('./'))
+
+        })
+
+    return es.merge.apply(null, tasks)
+
+})
+
 
 gulp.task('gm:compile-es6', ()=>{
 
@@ -403,7 +441,7 @@ gulp.task('gm:publish-html', cb=>{
 gulp.task('gm:compile', p.sequence(
     'gm:clean', 
     'gm:compile-copy',
-    ['gm:compile-sass', 'gm:compile-browserify'],
+    ['gm:compile-sprite', 'gm:compile-browserify'],
     'gm:compile-html'
 ))
 
@@ -1033,7 +1071,7 @@ gulp.task('gm:generate-config', ()=>{
 gulp.task('gm:generate-components', ()=>{
     // create componetns dir
     // May invalid for windows
-    sh.exec('mkdir '+_opts['components']+' >/dev/null 2>&1')
+    sh.exec('mkdir '+_opts['components']+_echo_off)
 })
 
 
@@ -1058,7 +1096,7 @@ gulp.task('gm:generate-meta', ()=>{
 
 
 gulp.task('gm:open-demo', ()=>{
-    sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+' >/dev/null 2>&1')
+    sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+_echo_off)
 })
 
 // init the proj
