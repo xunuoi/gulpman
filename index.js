@@ -331,7 +331,14 @@ function compile_sass(singleFile){
     // 此处增量编译scss, 当处于监视状态，只编译修改了的scss文件
     // 此处还没有关联到sass的增量，只关联了raw source中的css
     // @todo
-    let _sass_source = singleFile || sass_source
+    let _s = singleFile || sass_source
+
+    // gmutil.error(_s)
+    
+    let _sass_source = gmutil.convertSource(_s, 'css', ['scss', 'sass'])
+
+    // gmutil.error('s: '+_sass_source)
+
 
     return gulp.src(_sass_source)
     .pipe(p.sass())
@@ -343,7 +350,11 @@ function compile_sass(singleFile){
         'is_absolute': _opts['is_absolute'],
         'relevancyDir': _opts['runtime_assets'],
         'baseDir': _opts['runtime_static'],
-        // 'components': _opts['components'],
+
+        // debug
+        'getRelPath': getRelativePath,
+        'components': _opts['components'],
+        
         'isDevelop': isDevelop,
         'type': 'css',
         'rule': getB64ImgReg()
