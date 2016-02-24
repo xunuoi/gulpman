@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.5.2",
+  "version": "1.5.4",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.2.0"
@@ -39,8 +39,6 @@
   },
   "dependencies": {
     "gulp-babel": "^6.1.1",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-preset-react": "^6.3.13",
     "browserify": "^11.2.0",
     "colors": "^1.1.2",
     "event-stream": "^3.3.2",
@@ -61,6 +59,11 @@
     "vinyl-source-stream": "^1.1.0",
     "gulp-util": "^3.0.7",
     "jsmin2": "^1.1.7",
-    "uglifycss": "0.0.18"
+    "uglifycss": "0.0.18",
+    "bluebird": "^2.9.3",
+    "css": "^2.1.0",
+    "extend": "^2.0.0",
+    "fs-extra": "^0.14.0",
+    "spritesmith": "^1.0.3"
   }
 }
