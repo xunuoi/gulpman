@@ -17,6 +17,7 @@ gulpman.config({
     
 
     // cdn prefix 配置CDN域名前缀
+    // // 支持 传入 ｀字符串/数组/函数｀
     //'cdn_prefix': '', 
 
 

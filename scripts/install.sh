@@ -7,14 +7,15 @@ gulp -v >/dev/null 2>&1
 if [ $? -eq 0 ];then
     echo "\n*gulp has been installed"
 else
-    echo "\n*gulp not installed, now install gulp"
-    npm install gulp -g
+    echo "\n*gulp is not installed, now install gulp"
+    npm install --global gulp-cli
 fi
 
 
 # change dir to install local gulp
 cd ../..
 npm install gulp --save-dev
+# install babel preset
 npm install babel-preset-es2015 --save
 npm install babel-preset-react --save
 cd -

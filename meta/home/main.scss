@@ -7,6 +7,19 @@
     background: url(./img/logo.png) no-repeat;
 }
 
+// for sprite demo
+.demo-sprite {
+    background: url(./img/logo.png?_gm_sprite) no-repeat;
+    width: 50px;
+    height: 50px;
+}
+
+
+.demo-inline {
+    // if you want use inline-base64, 
+    // add `?_gm_inline` after img url
+}
+
 .header {
     width: 600px;
     margin: 0 auto;
