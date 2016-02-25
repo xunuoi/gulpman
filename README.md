@@ -86,6 +86,11 @@ gman.config({
     'url_prefix': '/static' 
 
 
+    // use spritesmith for css-img sprite
+    // 传递自动生成雪碧图的spritesmit的options
+    // 'spritesmith': {xxx}
+
+
     // 模块COMPONENTS目录，同一个模块的html和资源文件在一起。默认 'components'即可
     'components': 'components',
 

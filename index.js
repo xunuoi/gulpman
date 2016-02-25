@@ -91,7 +91,10 @@ let _opts = {
     'dist_views': './views_dist',
 
     'runtime_assets': './assets',
-    'dist_assets': './assets_dist'
+    'dist_assets': './assets_dist',
+
+    // for sprite
+    // 'spritesmith': {}
 }
 
 
@@ -281,17 +284,44 @@ function getRelevancyHandler() {
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
         },
         // 目前只有raw目录中的scss实现了增量编译
-        'css': compile_sass
+        'scss': compile_sass,
+        'sprite': function (file) {
+            p.sequence('gm:compile-css')()
+        }
     }
 }
 
 
+// for sprite
+function spriteCSS(entry) {
+    // gmutil.alert('Sprite Entry: '+entry)
+
+    return gulp.src(entry)
+    .pipe(spriter({
+        'cwd': _cwd,
+        // 'includeMode': 'explicit',
+        // The path and file name of where we will save the sprite sheet
+        'dist_root': _opts['runtime_static'],
+        // 'spriteSheet': j(_opts['dist_static'],'sprite_sheet.png'),
+        // Because we don't know where you will end up saving the CSS file at this point in the pipe,
+        // we need a litle help identifying where it will be.
+        // 'pathToSpriteSheetFromCSS': '../sprite_sheet.png'
+        'spritesmithOptions': _opts['spritesmith']
+    }))
+    .pipe(gulp.dest('./'))
+
+}
+
+
+
 // wrap the store check fn
-function storeCheck(filepath){
+function storeCheck(filepath, dbType, handlerType){
+    // check if the file is in relevancy data
     return store.check(
         filepath, 
-        _opts['runtime_assets'], 
-        getRelevancyHandler()
+        getRelevancyHandler(),
+        dbType,
+        handlerType
     )
 }
 
@@ -327,11 +357,12 @@ gulp.task('gm:compile-copy', ()=>{
 
 
 function compile_sass(singleFile){
-    
     // 此处增量编译scss, 当处于监视状态，只编译修改了的scss文件
     // 此处还没有关联到sass的增量，只关联了raw source中的css
     // @todo
     let _sass_source = singleFile || sass_source
+
+    // gmutil.tip('*Compile SCSS: '+_sass_source)
 
     return gulp.src(_sass_source)
     .pipe(p.sass())
@@ -341,10 +372,10 @@ function compile_sass(singleFile){
     })
     .pipe(base64({
         'is_absolute': _opts['is_absolute'],
-        'relevancyDir': _opts['runtime_assets'],
         'baseDir': _opts['runtime_static'],
-        // 'components': _opts['components'],
+        'components': _opts['components'],
         'isDevelop': isDevelop,
+        // the current files type
         'type': 'css',
         'rule': getB64ImgReg()
     }))
@@ -355,8 +386,8 @@ function compile_sass(singleFile){
     .pipe(through.obj((file, enc ,next)=>{
 
         if(isWatching){
-            gmutil.tip('*Relevancy Source: '+file.path)
-
+            gmutil.tip('*Relevancy File: '+file.path)
+            // store for relevancy scss
             storeCheck(file.path)
 
         } 
@@ -371,35 +402,23 @@ gulp.task('gm:compile-sass', ()=>{
     return compile_sass()
 })
 
-gulp.task('gm:compile-sprite', ['gm:compile-sass'], ()=>{
 
+gulp.task('gm:compile-css', ['gm:compile-sass'], ()=>{
+
+    // here sprite
     let files = globby.sync([css_source, except_lib_source]),
-        tasks = files.map((entry)=>{
-
-            // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
-
-            // console.log('entry: '+entry)
-            return gulp.src(entry)
-            .pipe(spriter({
-                    'cwd': _cwd,
-                    // 'includeMode': 'explicit',
-                // The path and file name of where we will save the sprite sheet
-                    'dist_root': _opts['runtime_static'],
-                    // 'spriteSheet': j(_opts['dist_static'],'sprite_sheet.png'),
-                    // Because we don't know where you will end up saving the CSS file at this point in the pipe,
-                    // we need a litle help identifying where it will be.
-                    // 'pathToSpriteSheetFromCSS': '../sprite_sheet.png'
-            }))
-            /*.pipe(p.rename(path=>{
-                console.log(path)
-            }))*/
-            .pipe(gulp.dest('./'))
-
-        })
+        tasks = files.map(entry=>spriteCSS(entry))
 
     return es.merge.apply(null, tasks)
-
 })
+
+
+/**
+ * THIS WILL TRIGGER `Trunk filled` Problem
+ */
+// for sass and sprite and inline(base64)
+// gulp.task('gm:compile-css', p.sequence('gm:compile-sass', 'gm:compile-sprite'))
+
 
 
 gulp.task('gm:compile-es6', ()=>{
@@ -441,7 +460,7 @@ gulp.task('gm:publish-html', cb=>{
 gulp.task('gm:compile', p.sequence(
     'gm:clean', 
     'gm:compile-copy',
-    ['gm:compile-sprite', 'gm:compile-browserify'],
+    ['gm:compile-css', 'gm:compile-browserify'],
     'gm:compile-html'
 ))
 
@@ -511,8 +530,6 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         tmp_rs_list = tmp_rs_list
             .concat(contents.match(gmutil.reg['tagMedia']))
             .concat(contents.match(gmutil.reg['closeTagMedia']))
-
-        // gmutil.error(tmp_rs_list)
             
         // 首先提取标签，然后从标签中提取href或者src
         tmp_rs_list.length && (
@@ -537,7 +554,6 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
 
         file.contents = new Buffer(contents)
 
-        // gmutil.warn(contents)
         this.push(file)
 
         gmutil.tip('*Raw HTML File Parsed: '+file.relative)
@@ -549,7 +565,6 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     })
     .pipe(base64({
         'is_absolute': _opts['is_absolute'],
-        'relevancyDir': _opts['runtime_assets'],
         'baseDir': _opts['runtime_assets'],
         'views': _isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views'],
         'dist_assets': _opts['dist_assets'],
@@ -570,11 +585,9 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         minifyJs: _isRuntimeDir ? false : true,  // 选择是否压缩js,
 
         'dist_dir': _opts['dist_assets'],
-        // 这个也是relevancyDir
         'runtime_dir': _opts['runtime_assets'],
 
         'root': _cwd
-        // basePath: _opts['runtime_assets']
     }))
     .pipe(gulp.dest(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views']))
 }
@@ -721,7 +734,9 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
 
 
     // watch scss ----------------------------------
-    let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-sass'])
+    // let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-sass'])
+    let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-css'])
+    
 
     css_watcher.on('change', event=>{
 
@@ -802,7 +817,10 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
                 // img ,eg.
                 let filePath = gmutil.pathInAssets(_cwd, epath, _opts['components'], _opts['runtime_static'])
 
+                // check for raw sources
                 storeCheck(filePath)
+                // check if in srpite
+                storeCheck(filePath, 'sprite', 'sprite')
                 
             }
             
