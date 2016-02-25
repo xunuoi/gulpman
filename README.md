@@ -14,6 +14,7 @@
 - 基于gulp的前端组件化、模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 支持图片base64方式嵌入到html/CSS
 - 支持JS/CSS内联方式嵌入html文件
+- 整合spritesmith，简单生成sprite雪碧图
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
 - 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
 
