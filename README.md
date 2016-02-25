@@ -37,7 +37,7 @@
 
 ##Config 配置
 
-###0. 支持傻瓜模式，无需配置即使用
+###0. 支持自动模式，无需配置即使用
 
 * 可直接跳过`Config 配置`处的说明，直接去看`Usage 使用`
 
@@ -87,8 +87,9 @@ gman.config({
 
 
     // use spritesmith for css-img sprite
+    // 基于spritesmith实现, 详细参见https://github.com/Ensighten/spritesmith
     // 传递自动生成雪碧图的spritesmit的options
-    // 'spritesmith': {xxx}
+    'spritesmith': { }
 
 
     // 模块COMPONENTS目录，同一个模块的html和资源文件在一起。默认 'components'即可
@@ -296,6 +297,23 @@ gulp gm:develop -c home
 ```
 
 * 注：所有内嵌嵌入的资源，包括图片/JS/CSS，在develop(监视)模式下，都已自动关联更新。即如果a.html文件中，内联嵌入了一个b.css，如果b.css发生了修改，那么a.html会自动编译更新。
+
+
+###6. 如何使用Sprite雪碧图
+
+* 基于spritesmith实现，在gulpman.config 中可传入spritesmith配置opts
+* 关于spritesmith详细参见：[https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
+* 只需要在scss文件中的图片url资源后面添加`?_gm_sprite`即可
+
+```css
+.demo {
+    background: url(./img/abc.png?_gm_sprite) no-repeat;
+    
+    /* other style you can set ...*/
+    width: 50px;
+    height: 50px;
+}
+```
 
 
 ###教程
