@@ -497,7 +497,29 @@ gulp.task('gm:publish-usemin', ()=>{
 
     let html_src = j(_opts['dist_views'], '**/*.html')
 
+    if(_opts['is_absolute']){
+        _opts['usemin']['path'] = _opts['dist_assets']
+
+        var diffPath = path.relative(_opts['dist_views'], _opts['dist_assets'])
+
+        _opts['usemin']['outputRelativePath'] = diffPath
+    }
+
+
     return gulp.src(html_src)
+    /*.pipe(through.obj(function(file, enc, cb){
+
+        if(_opts['is_absolute']){
+            _opts['usemin']['path'] = _opts['dist_assets']
+
+            var diffPath = path.relative(_opts['dist_views'], _opts['dist_assets'])
+
+            _opts['usemin']['outputRelativePath'] = diffPath
+        }
+
+        this.push(file)
+        return cb()
+    }))*/
     .pipe(p.usemin(_opts['usemin']))
     .pipe(gulp.dest(_opts['dist_views']))
 
@@ -541,7 +563,8 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         let contents = file.contents.toString()
         
         // 所有格式都要处理
-        let srcQuoteReg = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/]+?(\\.('+all_raw_source_reg+')))(?=\\?_gm_inline)?(?=[\'"]?)', 'gm')
+        let srcQuoteReg = new RegExp('(?=[\'"]?)([\\w\\.\\-\\?\\-\\/\\:]+?(\\.('+all_raw_source_reg+')))(?=\\?_gm_inline)?(?=[\'"]?)', 'gm'),
+            httpReg = /^http(s)?\:/
 
 
         let tmp_rs_list = [],
@@ -551,23 +574,25 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         tmp_rs_list = tmp_rs_list
             .concat(contents.match(gmutil.reg['tagMedia']))
             .concat(contents.match(gmutil.reg['closeTagMedia']))
-            
+
         // 首先提取标签，然后从标签中提取href或者src
         tmp_rs_list.length && (
             rs_list = tmp_rs_list
             .filter(r=>r.match(srcQuoteReg))
             .map(v=>v.match(srcQuoteReg)[0])
+            .filter(r=>{
+                // remove the http:xxx.com/xx
+                if(!r.match(httpReg)) return true
+            })
             .filter(r=>!r.match(/^(['"]\/)/gm))
         )
         
-
         // 这里利用set做去重
         let rs_set = new Set(rs_list),
             srcPrefix = j(_urlPrefix, fdirname)
 
         // 替换url的的path和前缀
         rs_set.size && rs_set.forEach(epath=>{
-
             // 对于base64的参数标识要保留，不能清理掉，因为后续要嵌入base64
             let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?_gm_inline)*(?=[\'"]?)', 'gm')
 
