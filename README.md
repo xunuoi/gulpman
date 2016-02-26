@@ -15,6 +15,7 @@
 - 支持图片base64方式嵌入到html/CSS
 - 支持JS/CSS内联方式嵌入html文件
 - 整合spritesmith，简单生成sprite雪碧图
+- 整合usemin，构建合并更加灵活强大
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
 - 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
 
@@ -92,7 +93,10 @@ gman.config({
     // use spritesmith for css-img sprite
     // 基于spritesmith实现, 详细参见https://github.com/Ensighten/spritesmith
     // 传递自动生成雪碧图的spritesmit的options
-    'spritesmith': { }
+    'spritesmith': { },
+    
+    // usemin config 配置usemin
+    'usemin': {}
 
 
     // 模块COMPONENTS目录，同一个模块的html和资源文件在一起。默认 'components'即可
@@ -317,6 +321,29 @@ gulp gm:develop -c home
     height: 50px;
 }
 ```
+
+###7. 如何使用Usemin
+
+* 整合usemin，在gulpman.config 中可传入usemin的配置opts
+* 关于usemin详细参见：[https://github.com/zont/gulp-usemin](https://github.com/zont/gulp-usemin)
+* 只需要在html文件中添加usemin的build注释即可。支持`js`|`css`|`inlinejs`|`inlinecss`等语法
+* 注意build注释中配置的输出路径写相对路径即可，跟script、link等标签类似，gulpman会自动转换成最终输出路径
+
+```html
+
+<!-- build:css ./home.css -->
+<link rel="stylesheet" type="text/css" href="./main.css">
+<link rel="stylesheet" type="text/css" href="./fff.css">
+<!-- endbuild -->
+
+
+<!-- build:js ../lib/base_lib.js -->
+<script type="text/javascript" src="../lib/jquery.js"></script>
+<script type="text/javascript" src="../lib/react.js"></script>
+<!-- endbuild -->
+```
+
+
 
 
 ###教程
