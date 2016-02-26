@@ -95,6 +95,16 @@ let _opts = {
 
     // for sprite
     // 'spritesmith': {}
+
+    // for usemin
+    'usemin': {
+        css: [ p.rev ],
+        // html: [ function () {return minifyHtml({ empty: true });} ],
+        js: [ p.uglify, p.rev ],
+        inlinejs: [ p.uglify ],
+        // inlinecss: [ p.cssnano ]
+    }
+
 }
 
 
@@ -483,6 +493,17 @@ function updateES6Compile(event){
 }
 
 
+gulp.task('gm:publish-usemin', ()=>{
+
+    let html_src = j(_opts['dist_views'], '**/*.html')
+
+    return gulp.src(html_src)
+    .pipe(p.usemin(_opts['usemin']))
+    .pipe(gulp.dest(_opts['dist_views']))
+
+})
+
+
 // 解析html文件中的资源路径和做处理
 function parseRawHTML(b, basepath, _isRuntimeDir) {
 
@@ -541,7 +562,8 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         
 
         // 这里利用set做去重
-        let rs_set = new Set(rs_list)
+        let rs_set = new Set(rs_list),
+            srcPrefix = j(_urlPrefix, fdirname)
 
         // 替换url的的path和前缀
         rs_set.size && rs_set.forEach(epath=>{
@@ -549,11 +571,16 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
             // 对于base64的参数标识要保留，不能清理掉，因为后续要嵌入base64
             let innerReg = new RegExp('(?=[\'"]?)('+epath+')(\\?_gm_inline)*(?=[\'"]?)', 'gm')
 
-            contents = contents.replace(innerReg, j(_urlPrefix, fdirname, epath)+'$2')
+            contents = contents.replace(innerReg, j(srcPrefix, epath)+'$2')
         })
 
-        file.contents = new Buffer(contents)
+        // dealing with usemin build mark syntax
+        // when in publish, not runtime-dir
+        if(!_isRuntimeDir) {
+            contents = gmutil.replaceBuildBlock(contents, srcPrefix)
+        }
 
+        file.contents = new Buffer(contents)
         this.push(file)
 
         gmutil.tip('*Raw HTML File Parsed: '+file.relative)
@@ -589,6 +616,23 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
 
         'root': _cwd
     }))
+    /*.pipe(through.obj(function (file, enc, cb){
+
+        if (file.isNull()) {
+            this.push(file);
+            return cb()
+        }
+        if (file.isStream()) {
+            gmutil.error('*ParseHtml Error: Streaming not supported')
+            return cb()
+        }
+
+        // gmutil.alert(file.contents.toString())
+        this.push(file)
+        return cb()
+
+
+    }))*/
     .pipe(gulp.dest(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views']))
 }
 
@@ -922,7 +966,6 @@ gulp.task('gm:js', ()=>{
 
 
 
-
 /**
  * Rev Generate MD5 for Source and File name
  * =================================
@@ -930,6 +973,9 @@ gulp.task('gm:js', ()=>{
 
 gulp.task('gm:rev', p.sequence(
     'gm:rev-lib-pre',
+    // for usemin
+    'gm:publish-usemin',
+
     'gm:rev-source', 
     ['gm:rev-html', 'gm:rev-css'])
 )
@@ -1032,6 +1078,7 @@ gulp.task('gm:copy', [
     'gm:copy-pure-source',
     'gm:publish-html'
 ],()=>{
+    // process.exit()
     // 从 runtime的views目录内容，拷贝到dist的views目录
     // return gulp.src(j(_opts['runtime_views'], '**/*.*'))
     // .pipe(gulp.dest(_opts['dist_views']))
@@ -1071,7 +1118,8 @@ gulp.task('gm:publish', p.sequence(
     'gm:publish-mode', 
     'gm:compile', 
     'gm:copy',
-    ['gm:js', 'gm:css', 'gm:imagemin'], 
+    ['gm:js', 'gm:css', 'gm:imagemin'],
+
     'gm:rev'
 ))
 
