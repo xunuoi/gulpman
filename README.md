@@ -11,13 +11,13 @@
 # gulpman
 
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- 基于gulp的前端组件化、模块化解决方案，比百度FIS更简单、灵活、可控性高，会gulp就会定制自己的方案
-- 支持图片base64方式嵌入到html/CSS
-- 支持JS/CSS内联方式嵌入html文件
-- 整合spritesmith，简单生成sprite雪碧图
-- 整合usemin，构建合并更加灵活强大
+- 基于`gulp`的前端组件化、模块化解决方案，比百度`FIS`更简单、灵活、可控性高，会gulp就会定制自己的方案
+- 支持图片`base64`方式嵌入到`html/CSS`
+- 支持`JS/CSS`内联方式嵌入html文件
+- 整合`spritesmith`，简单生成sprite雪碧图
+- 整合`usemin`，构建合并更加灵活强大
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改都超简单
-- 扩展性高，gulp现有的插件都可以拼装、加入到gulpman中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合browser-sync到构建系统中。
+- 扩展性高，`gulp`现有的插件都可以拼装、加入到`gulpman`中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合`browser-sync`到构建系统中。
 
 
 
@@ -25,7 +25,7 @@
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
-- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语法
+- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语句
 
 
 ##Install 安装
@@ -41,9 +41,9 @@
 
 ##Config 配置
 
-###0. 支持自动模式，无需配置即使用
+###0. 支持自动默认模式，无需配置即使用
 
-* 可直接跳过`Config 配置`处的说明，直接去看`Usage 使用`
+* 可直接跳过`Config 配置`处的说明，直接去看后面的`Usage 使用`内容
 
 
 ###1. 配置 gulpfile.js:
