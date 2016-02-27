@@ -117,3 +117,7 @@ echo "\n*Any Question: \n  xunuoi@163.com\n  xwlxyjk@gmail.com\n\n"
 
 echo "     ======= * =======\n\n\n\n\n\n"
 
+
+# Mac OS Inform
+osascript -e 'display notification "Enjoy!" with title "Gulpman Install Succeed"' >/dev/null 2>&1
+
