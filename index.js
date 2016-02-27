@@ -5,39 +5,9 @@
  * xwlxyjk@gmail.com
  */
 
-'use strict'
-
-// system module
-let path = require('path'),
-    j = path.join,
-    sh = require("shelljs")
-
-// gulp module
-let gulp = require('gulp'),
-    p = require('gulp-load-plugins')(),
-
-    // modules
-    pngquant = require('imagemin-pngquant'),
-    browserify = require('browserify'),
-    stringify = require('stringify'),
-    buffer = require('vinyl-buffer'),
-    source = require('vinyl-source-stream'),
-    es = require('event-stream'),
-    globby = require('globby'),
-    through = require('through2'),
-
-    // gulpman utils
-    gmutil = require('./lib/gmutil'),
-    base64 = require('./lib/base64'),
-    store = require('./lib/store'),
-    htmlInline = require('./lib/inline'),
-    revReplace = require('./lib/revReplace'),
-
-    // css spriter
-    spriter = require('./lib/spriter')
 
 /**
- * *** FOR GULPER ***
+ * *** FOR GULPMAN ***
  * ===============================================
  */
 
@@ -49,13 +19,13 @@ let gulp = require('gulp'),
  * 2. js中图片资源转换inline的base64功能，比如将 var logoImgSrc = './img/a.png?_gm_inline'，最后转换完成后，logoImgSrc = 'xxx'，得到一份完整的base64的编码字符串。如果不带有_gm_inline标记，将不会替换
  * 
  *
- * 3. 全局内容的绝对路径，主要是可能是css和js，比如css 中的 ./img/a.png ，最后都能转换成 /static/home/img/a.png，这样cdn功能也更加完整可用。同时将会解决[4]的问题。
+ * 3. 全局内容的绝对路径，主要是可能是css和tpl和js，比如css 中的 ./img/a.png ，最后都能转换成 /static/home/img/a.png，这样cdn功能也更加完整可用。同时将会解决[4]的问题。
  *
  * 4. html的inline内容嵌入时，引用资源的路径转换问题。比如css中./a.png需要转成 ../../assets/static/home/a.png才能正常，js也会有类似inline后引用的资源的问题。解决方法可以是做转换 (全局绝对路径下无需转换)。相对路径转换的算法，大致是计算a.html到a.css路径：html_css_path，然后计算从a.css到a.css中引入的a.png路径：css_media_path，那么最终在html文件中inline的a.png的路径就是path.join(html_css_path, css_media_path)，注意除了图片，还有可能是font，比如svg、eot之类的资源
  *
  * 5. js资源定位处理的流程，可考虑添加到compile-es6和update-es6，支队es6或者jsx文件有效。
  * 
- * 6. 对css和js文件内容中的资源url全局绝对路径处理，可以放到compile-css结束前和compile-es6/update-es6 结束前，去替换其中的资源url为全局，这样后面parseRawHTML中做inline时候就已经是绝对路径了，不需要再做inline时候路径转换，所以这个处理顺序是对的。
+ * 6. 对css和tpl和js文件内容中的资源url全局绝对路径处理，可以放到compile-css结束前和compile-es6/update-es6 结束前，去替换其中的资源url为全局，这样后面parseRawHTML中做inline时候就已经是绝对路径了，不需要再做inline时候路径转换，所以这个处理顺序是对的。
  *
  * 7. css中引用的资源url可能包括 img/font-face。
  *    js中引用的资源src可能包括 css/img/other(比如任意文件引用)
@@ -91,6 +61,43 @@ let gulp = require('gulp'),
  * 4. 最后重新输出到 components dist目录和assets dist目录
  * 5. md5和非md5文件目前是混合在一起的
  */
+
+
+
+// =======================================
+
+
+'use strict'
+
+// system module
+let path = require('path'),
+    j = path.join,
+    sh = require("shelljs")
+
+// gulp module
+let gulp = require('gulp'),
+    p = require('gulp-load-plugins')(),
+
+    // modules
+    pngquant = require('imagemin-pngquant'),
+    browserify = require('browserify'),
+    stringify = require('stringify'),
+    buffer = require('vinyl-buffer'),
+    source = require('vinyl-source-stream'),
+    es = require('event-stream'),
+    globby = require('globby'),
+    through = require('through2'),
+
+    // gulpman utils
+    gmutil = require('./lib/gmutil'),
+    base64 = require('./lib/base64'),
+    store = require('./lib/store'),
+    htmlInline = require('./lib/inline'),
+    revReplace = require('./lib/revReplace'),
+
+    // css spriter
+    spriter = require('./lib/spriter')
+
 
 
 // define base vars ========================================
