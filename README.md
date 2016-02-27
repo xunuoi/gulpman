@@ -238,7 +238,21 @@ gulp gm:compile
 ```
 
 
-###2. 如何在gulpman架构下使用React
+###2. 开发中只监视某个component目录
+
+* 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
+
+* 比如说，只监视components目录下的home模块：
+
+```Shell
+
+gulp gm:develop -c home
+
+```
+
+
+
+###3. 如何在gulpman下使用React
 
 * 方法一：通过script标签引入React类库到HTML (推荐)
 
@@ -256,21 +270,15 @@ import 'react'
 ```
 
 
+###4. 如何在js|es6|jsx中使用tpl模板
 
-###3. 开发中只监视某个component目录
+* 目前支持.tpl扩展名的模板文件，直接打包到最终的js文件中
 
-* 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
-
-* 比如说，只监视components目录下的home模块：
-
-```Shell
-
-gulp gm:develop -c home
-
-```
+* 用法：`import dialogTpl from './dialog.tpl'` 或者 `var dialogTpl = require('./dialog.tpl')`
 
 
-###4. 如何在HTML/CSS中嵌入base64编码的图片
+
+###5. 如何在HTML/CSS中嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
@@ -293,7 +301,7 @@ gulp gm:develop -c home
 }
 ```
 
-###5. 如何在HTML中嵌入内联CSS/JS
+###6. 如何在HTML中嵌入内联CSS/JS
 
 * 类似图片base64,只需要资源后面添加`?_gm_inline`即可
 
@@ -306,7 +314,7 @@ gulp gm:develop -c home
 * 注：所有内嵌嵌入的资源，包括图片/JS/CSS，在develop(监视)模式下，都已自动关联更新。即如果a.html文件中，内联嵌入了一个b.css，如果b.css发生了修改，那么a.html会自动编译更新。
 
 
-###6. 如何使用Sprite雪碧图
+###7. 如何使用Sprite雪碧图
 
 * 基于spritesmith实现，在gulpman.config 中可传入spritesmith配置opts
 * 关于spritesmith详细参见：[https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
@@ -322,7 +330,7 @@ gulp gm:develop -c home
 }
 ```
 
-###7. 如何使用Usemin
+###8. 如何使用Usemin
 
 * 整合usemin，在gulpman.config 中可传入usemin的配置opts
 * 关于usemin详细参见：[https://github.com/zont/gulp-usemin](https://github.com/zont/gulp-usemin)
