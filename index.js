@@ -41,6 +41,40 @@ let gulp = require('gulp'),
  */
 
 /**
+ * 问题 ISSUES:
+ * 
+ * 1. js中资源嵌入功能，比如图片的src资源嵌入或者再js中嵌入css文件，可以用标记字符实现，比如在js中定义变量 var logoImgSrc = './img/a.png?_gm_src'，那么在构建过程中，将带?_gm_src的字符串替换成构建后的真实相对路径，比如变成了'./img/a-8d4afc.png'。如果不带有_gm_src标记，将不会替换
+ *
+ * 2. js中图片资源转换inline的base64功能，比如将 var logoImgSrc = './img/a.png?_gm_inline'，最后转换完成后，logoImgSrc = 'xxx'，得到一份完整的base64的编码字符串。如果不带有_gm_inline标记，将不会替换
+ * 
+ *
+ * 3. 全局内容的绝对路径，主要是可能是css和js，比如css 中的 ./img/a.png ，最后都能转换成 /static/home/img/a.png，这样cdn功能也更加完整可用。同时将会解决[4]的问题。
+ *
+ * 4. html的inline内容嵌入时，引用资源的路径转换问题。比如css中./a.png需要转成 ../../assets/static/home/a.png才能正常，js也会有类似inline后引用的资源的问题。解决方法可以是做转换 (全局绝对路径下无需转换)。相对路径转换的算法，大致是计算a.html到a.css路径：html_css_path，然后计算从a.css到a.css中引入的a.png路径：css_media_path，那么最终在html文件中inline的a.png的路径就是path.join(html_css_path, css_media_path)，注意除了图片，还有可能是font，比如svg、eot之类的资源
+ *
+ * 5. js资源定位处理的流程，可考虑添加到compile-es6和update-es6，支队es6或者jsx文件有效。
+ * 
+ * 6. 对css和js文件内容中的资源url全局绝对路径处理，可以放到compile-css结束前和compile-es6/update-es6 结束前，去替换其中的资源url为全局，这样后面parseRawHTML中做inline时候就已经是绝对路径了，不需要再做inline时候路径转换，所以这个处理顺序是对的。
+ *
+ * 7. css中引用的资源url可能包括 img/font-face。
+ *    js中引用的资源src可能包括 css/img/other(比如任意文件引用)
+ *    html中引用的资源可能包括 css/js/img/video/audio
+ *    [目前html中的绝对路径/相对路径已完成，css和js未做绝对路径]
+ *
+ *
+ * 
+ * 综合 TO DO：
+ * 
+ * a. 当`is_absolute`为true的时候，开启全局(包括html/css/js)绝对路径，否则使用相对路径。目前只有html中能启用全局url
+ * b. 如果未开启全局，使用相对路径，那么inline的时候给引用的资源url做路径转换，算法参见[4]
+ * c. 在a, b基础上，解决上面[1]和[2]提到的js中资源嵌入功能
+ *
+ * 
+ */
+
+
+
+/**
  * ### Develop Description
  * 1. 先将静态资源文件的源文件scss, less, es6等，编译输出到asset runtime目录
  * 2. 将模板html文件，更新资源url后输出到 components runtime 目录
@@ -196,27 +230,38 @@ function OSInform(title, _message, err){
     
     try {
         // call the os inform
-        sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'")
+        sh.exec("osascript -e 'display notification \""+message+"\" with title \""+title+"\"'"+_echo_off)
 
     }catch(err){
         gmutil.warn('*Call System Inform Failed!')
     }
 
-    // print the err messsage
-    err && err.message && gmutil.error('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n')
+    if(err){
+        var errDesc = err['codeFrame'] || ''
+
+        // print the err messsage
+        err && err.message && gmutil.error('\n*'+err.plugin+': '+err.name+'\n' + err.message+'\n'+errDesc+'\n')
+    }
 
     return {
-      then (cb){
-        cb && cb()
-      }
+        then (cb){
+            cb && cb()
+        }
     }
 }
 
 
-function OSInformError(title, err, cb){
+function OSInformError(title, err, errDesc){
+
     let filePath = getRelativePath(err.fileName)
+
+    var einfo = errDesc || filePath
+
+    if(einfo === undefined){
+        einfo = 'Interal Error Occured'
+    } 
     
-    return OSInform(title, filePath, err)
+    return OSInform(title, einfo, err)
 
 }
 
@@ -245,58 +290,74 @@ function browserified(fpath, sourceDir){
         ]
     }
 
-    // use wathcify to browseirfy
+    // use wathcify to browserify
     // var watchifybOpts = Object.assign(_bOpts, watchify.args)
     // return watchify(browserify(watchifybOpts)).bundle()
 
     return browserify(_bOpts)
     .bundle()
+    .on('error', function(err){
+        // console.log(err)
+        err.plugin = 'Browserify'
+        OSInformError('Browserify Error', err, err['message'])
+        // browseirfy的流特殊，需要emti才能停止，否则会挂掉
+        this.emit('end')
+    })
     .pipe(source(fpath))
     .pipe(buffer())
-    .on('error', function(err){
-        OSInformError('Browserify Error', err)  
-    })
 
 }
 
 
+// 根据代码的require等，打包js文件
 function do_browserify(){
-      var files = globby.sync(j(_opts['runtime_static_tmp'], '**/*.es6')),
-        tasks = files.map((entry)=>{
-            // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
 
-            return browserified(entry, _opts['runtime_static_tmp'])
-            .pipe(p.rename(path=>{
+    // 这里没有做增量打包，因为依赖性不确定，需要重新整体打包
+    // 此处取tmp目录，确保源文件干净没有被browserify过
 
-                /**
-                 * 此处作用是，将.tmp_raw_static目录，
-                 * 作为未打包备份目录，不被打包后文件覆盖
-                 * 这样.tmp_raw_static目录可以被watch中触发的打包服务
-                 */
-                
-                path['dirname'] = path['dirname'].replace(_opts['runtime_static_tmp'], _opts['runtime_static'])
+    var files = globby.sync(j(_opts['runtime_static_tmp'], '**/*.es6')),
+    tasks = files.map((entry)=>{
+        // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
 
-                path.extname = '.js'
-            }))
-            .pipe(gulp.dest('./'))
-        })
+        return browserified(entry, _opts['runtime_static_tmp'])
+        .pipe(p.rename(path=>{
+
+            /**
+             * 此处作用是，将.tmp_raw_static目录，
+             * 作为未打包备份目录，不被打包后文件覆盖
+             * 这样.tmp_raw_static目录可以被watch中触发的打包服务
+             */
+            
+            path['dirname'] = path['dirname'].replace(_opts['runtime_static_tmp'], _opts['runtime_static'])
+
+            path.extname = '.js'
+        }))
+        .pipe(gulp.dest('./'))
+    })
 
     return es.merge.apply(null, tasks)
 }
 
+
+function getComponentsPath(){
+    return j(_cwd, _opts['components'])
+}
 
 // get handler for relevancy update
 function getRelevancyHandler() {
     return {
         'html': function (rawHtmlFile){
             // html实现了增量编译base64文件
-            let basepath = j(_cwd, _opts['components'])
+            gmutil.tip('*Relevancy HTML: '+rawHtmlFile)
+            let basepath = getComponentsPath()
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
         },
-        // 目前只有raw目录中的scss实现了增量编译
+        // 目前只有raw目录中被引用的的scss实现了增量编译
         'scss': compile_sass,
-        'sprite': function (file) {
-            p.sequence('gm:compile-css')()
+        'sprite': function (file) { 
+            // the gulp.start was depcreated
+            // can use this p.sequence('gm:compile-css')()
+            gulp.start('gm:compile-css')
         }
     }
 }
@@ -304,8 +365,8 @@ function getRelevancyHandler() {
 
 // for sprite
 function spriteCSS(entry) {
-    // gmutil.alert('Sprite Entry: '+entry)
 
+    // gmutil.alert('Sprite Entry: '+entry)
     return gulp.src(entry)
     .pipe(spriter({
         'cwd': _cwd,
@@ -318,6 +379,10 @@ function spriteCSS(entry) {
         // 'pathToSpriteSheetFromCSS': '../sprite_sheet.png'
         'spritesmithOptions': _opts['spritesmith']
     }))
+    .on('error', function(err){
+        OSInformError('CSS Spriter Error', err)
+        this.end() 
+    })
     .pipe(gulp.dest('./'))
 
 }
@@ -370,6 +435,8 @@ function compile_sass(singleFile){
     // 此处增量编译scss, 当处于监视状态，只编译修改了的scss文件
     // 此处还没有关联到sass的增量，只关联了raw source中的css
     // @todo
+    // singleFile = getChangedFile('scss')
+
     let _sass_source = singleFile || sass_source
 
     // gmutil.tip('*Compile SCSS: '+_sass_source)
@@ -377,7 +444,11 @@ function compile_sass(singleFile){
     return gulp.src(_sass_source)
     .pipe(p.sass())
     .on('error', function(err){
-        OSInformError('SCSS Compile Error', err)
+        // console.log(err)
+        OSInformError('SCSS Compile Error', err, 'Compile Error')
+
+        // this.end()
+        this.emit('end')
         // .then(()=>gmutil.error(errMessage))
     })
     .pipe(base64({
@@ -391,20 +462,10 @@ function compile_sass(singleFile){
     }))
     .on('error', function(err){
         OSInformError('CSS Img-Base64 Error', err)
+        this.end()
     })
     .pipe(gulp.dest(_opts['runtime_static']))
-    .pipe(through.obj((file, enc ,next)=>{
-
-        if(isWatching){
-            gmutil.tip('*Relevancy File: '+file.path)
-            // store for relevancy scss
-            storeCheck(file.path)
-
-        } 
-
-        return next()
-    }))
-    // 这里没有复制到static的备份目录
+    // 这里没有复制到static的.tmp_raw_static备份目录
 }
 
 gulp.task('gm:compile-sass', ()=>{
@@ -415,11 +476,23 @@ gulp.task('gm:compile-sass', ()=>{
 
 gulp.task('gm:compile-css', ['gm:compile-sass'], ()=>{
 
-    // here sprite
+    // here generate sprite into css
     let files = globby.sync([css_source, except_lib_source]),
         tasks = files.map(entry=>spriteCSS(entry))
 
     return es.merge.apply(null, tasks)
+    .pipe(through.obj((file, enc ,next)=>{
+
+        // 此刻检查关联性，sprite那块还未处理，所有html更新的inline的css中，只有处理了base64，应该在sprite处理完css后，再检查
+        if(isWatching){
+            gmutil.tip('*Relevancy File: '+file.path)
+            // store for relevancy scss
+            storeCheck(file.path)
+
+        } 
+
+        return next()
+    }))
 })
 
 
@@ -435,15 +508,19 @@ gulp.task('gm:compile-es6', ()=>{
 
     return gulp.src(es6_source)
     .pipe(p.babel(_opts['babel']))
-    .on('error', err=>{
+    .on('error', function(err) {
         OSInformError('Babel Error', err)
+        this.end()
+        throw Error('*Compile Stopped for the Babel Error')
     })
     .pipe(p.rename(path=>{
         // 这里有一部分是从es6转成的.js，也有一部分是jsx转成的.js
-        // 此处都统一扩展名设置为.es6
+        // 此处都统一扩展名设置为.es6，方便后面browserify打包
         path.extname = '.es6'
     }))
+    // 输出到tmp目录，是为了browserify文件时，源文件时干净的，避免被打包过的又打包一次
     .pipe(gulp.dest(_opts['runtime_static_tmp']))
+    // 这个是输出目录
     .pipe(gulp.dest(_opts['runtime_static']))
 })
 
@@ -467,32 +544,6 @@ gulp.task('gm:publish-html', cb=>{
 })
 
 
-gulp.task('gm:compile', p.sequence(
-    'gm:clean', 
-    'gm:compile-copy',
-    ['gm:compile-css', 'gm:compile-browserify'],
-    'gm:compile-html'
-))
-
-
-/**
- * FOR DEVELOP WATCHT ================================
- */
-
-/**
- * 因为task不能传参，这里用全局变量来实现，
- * 后续考虑优化
- * @type {[type]}
- */
-
-let _g_es6_event = null
-
-function updateES6Compile(event){
-    _g_es6_event = event
-    gulp.start('update_browserify')
-}
-
-
 gulp.task('gm:publish-usemin', ()=>{
 
     let html_src = j(_opts['dist_views'], '**/*.html')
@@ -507,28 +558,77 @@ gulp.task('gm:publish-usemin', ()=>{
 
 
     return gulp.src(html_src)
-    /*.pipe(through.obj(function(file, enc, cb){
-
-        if(_opts['is_absolute']){
-            _opts['usemin']['path'] = _opts['dist_assets']
-
-            var diffPath = path.relative(_opts['dist_views'], _opts['dist_assets'])
-
-            _opts['usemin']['outputRelativePath'] = diffPath
-        }
-
-        this.push(file)
-        return cb()
-    }))*/
     .pipe(p.usemin(_opts['usemin']))
     .pipe(gulp.dest(_opts['dist_views']))
 
 })
 
 
+gulp.task('gm:compile', p.sequence(
+    'gm:clean', 
+    'gm:compile-copy',
+    ['gm:compile-css', 'gm:compile-browserify'],
+    'gm:compile-html'
+))
+
+
+
+/**
+ * FOR DEVELOP WATCHT ================================
+ */
+
+/**
+ * 因为task不能传参，这里用全局变量来实现，
+ * 后续考虑优化
+ * @type {[type]}
+ */
+
+let _g_update_evt = {
+    'scss': {
+        'event': null,
+        'task': 'gm:compile-css'
+    },
+    'es6': {
+        'event': null,
+        'task': 'gm:update-js'
+    }
+}
+
+
+function fireUpdate(type, event){
+
+    _g_update_evt[type]['event'] = event
+
+    let _task = _g_update_evt[type]['task']
+
+    _task && gulp.start(_task)
+}
+
+
+function getChangedEvent(type){
+    return _g_update_evt[type]['event']
+}
+
+
+function removeUpdateEvent(type){
+    _g_update_evt[type] && (_g_update_evt[type]['event'] = null)
+}
+
+
+
+
 // 解析html文件中的资源路径和做处理
 function parseRawHTML(b, basepath, _isRuntimeDir) {
 
+    /**
+     * @debug 未完成inline后的路径转换
+     *
+     * 1. 这里inline后需要一个路径转换，比如css中./a.png 当inline到html中，可能变成了 ../../assets/static/home/a.png，不转换将可能404。
+     * 2. 如果将行内内容或者components中全部内容中（可能主要是css的资源引用，js现在没有做资源嵌入）的资源引用都做成绝对路径，那么没有这个问题了。也可以考虑在做inline的时候，转换路径，也就是1。
+     */
+
+
+    // 第一步先计算并替换html的相关路径
     return b.pipe(through.obj(function (file, enc, cb){
 
         if (file.isNull()) {
@@ -606,16 +706,17 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         }
 
         file.contents = new Buffer(contents)
-        this.push(file)
-
+        
         gmutil.tip('*Raw HTML File Parsed: '+file.relative)
 
+        this.push(file)
         cb()
     }))
-    .on('error', err=>{
+    .on('error', function(err) {
         OSInformError('ParseHtml Error', err)
+        this.end()
     })
-    .pipe(base64({
+    .pipe(base64({// 第二步，替换生成html原本内容本身中的base64图片路径, 比如img标签中有?_gm_inline则被替换为base64
         'is_absolute': _opts['is_absolute'],
         'baseDir': _opts['runtime_assets'],
         'views': _isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views'],
@@ -626,45 +727,38 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
     }))
     .on('error', function(err){
         OSInformError('HTML Img-Base64 Error', err)
+        this.end()
     })
-    .pipe(htmlInline({
+    .pipe(htmlInline({// 第三步，向html中替换插入行内标记的内容
 
         'is_runtime': _isRuntimeDir,
         'absoluteRoot': _opts['is_absolute'] ? (_isRuntimeDir ? _opts['runtime_assets'] :  _opts['dist_assets']) : false,
 
         queryKey: '_gm_inline',
-        minifyCss: _isRuntimeDir ? false : true, // 选择是否压缩css
-        minifyJs: _isRuntimeDir ? false : true,  // 选择是否压缩js,
+        // 选择是否压缩css
+        minifyCss: _isRuntimeDir ? false : true,
+        // 选择是否压缩js, 
+        minifyJs: _isRuntimeDir ? false : true,  
 
         'dist_dir': _opts['dist_assets'],
         'runtime_dir': _opts['runtime_assets'],
 
         'root': _cwd
     }))
-    /*.pipe(through.obj(function (file, enc, cb){
-
-        if (file.isNull()) {
-            this.push(file);
-            return cb()
-        }
-        if (file.isStream()) {
-            gmutil.error('*ParseHtml Error: Streaming not supported')
-            return cb()
-        }
-
-        // gmutil.alert(file.contents.toString())
-        this.push(file)
-        return cb()
-
-
-    }))*/
+    .on('error', function(err){
+        OSInformError('htmlInline Error', err)
+        this.end()
+    })
     .pipe(gulp.dest(_isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views']))
+    
 }
 
 
 
 function getRelativePath(epath) {
-    let _tarPath = j(_cwd, _opts['components'])
+    if(epath === undefined) return;
+
+    let _tarPath = getComponentsPath()
     let relPath = epath.replace(_tarPath, '')
 
     return relPath
@@ -709,12 +803,21 @@ function getTarPath(epath, replaceDir){
 
 // tasks
 
-gulp.task('update-es6', ()=>{
-    let epath = _g_es6_event.path,
-        etype = _g_es6_event.type
+gulp.task('gm:update-es6', ()=>{
+
+    //这里用增量更新处理了已经，只babel转换有变动的es6
+
+    var _evt = getChangedEvent('es6')
+
+    let epath = _evt.path,
+        etype = _evt.type
 
     return gulp.src(epath)
     .pipe(p.babel(_opts['babel']))
+    .on('error', function(err){
+        OSInformError('Babel Error', err)
+        this.end()
+    })
     .pipe(p.rename(path=>{
         let relPath = getRelativePath(epath)
 
@@ -726,7 +829,6 @@ gulp.task('update-es6', ()=>{
          * 而不是输出到已经打包的目录,
          * 否则会覆盖正式的static目录中打包后的js文件)
          */
-
         path.dirname = j(_opts['runtime_static_tmp'], relPath)
         path.extname = '.es6'
         
@@ -737,7 +839,7 @@ gulp.task('update-es6', ()=>{
 })
 
 
-gulp.task('update_browserify', ['update-es6'], ()=>{
+gulp.task('gm:update-js', ['gm:update-es6'], ()=>{
     return do_browserify()
 })
 
@@ -784,41 +886,39 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
     js_watcher.on('change', event=>{
 
         switch(event.type){
-            case 'changed':
-                updateES6Compile(event)
-                break
-            case 'added':
-                updateES6Compile(event)
-                break
-
             case 'deleted':
                 delChangedFile(event.path, _opts['runtime_static'], 'js')
                 delChangedFile(event.path, _opts['runtime_static_tmp'], 'js')
                 break
 
+            // for added changed
             default: 
-                throw Error('Unknow Type: ' + event.type)
+                fireUpdate('es6', event)
         }
     })
 
 
     // watch scss ----------------------------------
-    // let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-sass'])
-    let css_watcher = gulp.watch(_watch_css_source, ['gm:compile-css'])
-    
+    let css_watcher = gulp.watch(_watch_css_source/*, ['gm:compile-css']*/)
+    // 目前watch scss并没有做成增量，因为sass有自身模块依赖机制
 
     css_watcher.on('change', event=>{
 
-      let epath = event.path,
-          etype = event.type
-            
-      switch(event.type){
-          case 'deleted':
-              delChangedFile(epath, _opts['runtime_static'], 'css')
-              break
-      }
+        let epath = event.path,
+            etype = event.type
 
-      return false
+        // fireUpdate('scss', event)
+            
+        switch(event.type){
+            case 'deleted':
+                delChangedFile(epath, _opts['runtime_static'], 'css')
+                break
+
+            default:
+               fireUpdate('scss', event) 
+        }
+
+        return false
 
     })
 
@@ -838,7 +938,7 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
             
             let rawHtmlFile = j(_opts['components'], relPath)
             
-            let basepath = j(_cwd, _opts['components'])
+            let basepath = getComponentsPath()
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
 
         }else if(etype == 'deleted'){
@@ -929,6 +1029,7 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
     isWatching = true
 
     gmutil.tip('\n*Now Watching For Development:\n')
+    OSInform('Ready For Development', 'Go!')
      
 })
 
@@ -939,8 +1040,6 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
 
 // utils
 function setRevReplace(){
-
-    // gmutil.error('cdn: ', _opts['cdn_prefix'])
 
     let manifest = gulp.src(j(_opts['dist_assets'],'rev-manifest.json'))
     return revReplace({
@@ -1030,7 +1129,7 @@ gulp.task('gm:lib-mincss', ()=>{
 // minify the lib js
 gulp.task('gm:lib-uglify', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.js'))
-    // uglify libjs常会导致错误
+    // uglify libjs常会导致错误,某些第三方类库uglify导致的
     // .pipe(p.uglify())
     .pipe(gulp.dest(dist_lib_path))
 })
@@ -1085,11 +1184,11 @@ gulp.task('gm:rev-css', ()=>{
 })
 
 
-
 // create ../assets_dist
 gulp.task('gm:create-assets-dist-dir', ()=>{
     sh.mkdir(_opts['dist_assets'])
 })
+
 
 gulp.task('gm:copy-pure-source', ()=>{
 
@@ -1103,7 +1202,6 @@ gulp.task('gm:copy', [
     'gm:copy-pure-source',
     'gm:publish-html'
 ],()=>{
-    // process.exit()
     // 从 runtime的views目录内容，拷贝到dist的views目录
     // return gulp.src(j(_opts['runtime_views'], '**/*.*'))
     // .pipe(gulp.dest(_opts['dist_views']))
@@ -1138,16 +1236,24 @@ gulp.task('gm:publish-mode', ()=>{
     isDevelop = false
 })
 
+
+gulp.task('gm:osinform', ()=>{
+    OSInform('Publish Succeed', 'Enjoy!')
+})
+
 // publish source ,based on the runtime source
 gulp.task('gm:publish', p.sequence(
     'gm:publish-mode', 
     'gm:compile', 
     'gm:copy',
     ['gm:js', 'gm:css', 'gm:imagemin'],
+    'gm:rev',
 
-    'gm:rev'
+    'gm:osinform'
 ))
 
+
+// For init demo and constructure ===============
 
 // init dir and create some meta files
 gulp.task('gm:generate-config', ()=>{
@@ -1159,8 +1265,9 @@ gulp.task('gm:generate-config', ()=>{
 })
 
 
+// create componetns dir
 gulp.task('gm:generate-components', ()=>{
-    // create componetns dir
+    
     // May invalid for windows
     sh.exec('mkdir '+_opts['components']+_echo_off)
 })
@@ -1186,9 +1293,13 @@ gulp.task('gm:generate-meta', ()=>{
 })
 
 
+// open demo html file
 gulp.task('gm:open-demo', ()=>{
     sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+_echo_off)
+
+    OSInform('Init Succeed', 'Enjoy!')
 })
+
 
 // init the proj
 gulp.task('gm:init', p.sequence(
@@ -1211,6 +1322,7 @@ function updateConf(opts){
 
     return _opts
 }
+
 
 exports['config'] = updateConf
 
