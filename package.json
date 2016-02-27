@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.6.3",
+  "version": "1.6.5",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.2.0"
@@ -40,6 +40,7 @@
   "dependencies": {
     "gulp-babel": "^6.1.1",
     "browserify": "^11.2.0",
+    "stringify": "^4.0.1",
     "colors": "^1.1.2",
     "event-stream": "^3.3.2",
     "globby": "^2.1.0",

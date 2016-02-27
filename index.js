@@ -19,6 +19,7 @@ let gulp = require('gulp'),
     // modules
     pngquant = require('imagemin-pngquant'),
     browserify = require('browserify'),
+    stringify = require('stringify'),
     buffer = require('vinyl-buffer'),
     source = require('vinyl-source-stream'),
     es = require('event-stream'),
@@ -287,7 +288,9 @@ function browserified(fpath, sourceDir){
         paths: [
             j(sourceDir, _opts['lib']),
             j(sourceDir, _opts['global'])
-        ]
+        ],
+
+        transform: [ stringify(['.tpl', '.txt']) ]
     }
 
     // use wathcify to browserify
@@ -297,9 +300,10 @@ function browserified(fpath, sourceDir){
     return browserify(_bOpts)
     .bundle()
     .on('error', function(err){
-        // console.log(err)
+        
         err.plugin = 'Browserify'
         OSInformError('Browserify Error', err, err['message'])
+        gmutil.warn(err)
         // browseirfy的流特殊，需要emti才能停止，否则会挂掉
         this.emit('end')
     })
@@ -312,7 +316,8 @@ function browserified(fpath, sourceDir){
 // 根据代码的require等，打包js文件
 function do_browserify(){
 
-    // 这里没有做增量打包，因为依赖性不确定，需要重新整体打包
+    // 这里不做增量打包，因为js有自身依赖机制，并非单一依赖，需要重新整体打包
+    // 此处如果是tpl发生变化，也会导致重新打包
     // 此处取tmp目录，确保源文件干净没有被browserify过
 
     var files = globby.sync(j(_opts['runtime_static_tmp'], '**/*.es6')),
@@ -591,7 +596,14 @@ let _g_update_evt = {
     'es6': {
         'event': null,
         'task': 'gm:update-js'
+    },
+    // need browserify
+    'tpl': {
+        'event': null,
+        'task': 'gm:update-tpl'
     }
+
+    
 }
 
 
@@ -678,7 +690,7 @@ function parseRawHTML(b, basepath, _isRuntimeDir) {
         // 首先提取标签，然后从标签中提取href或者src
         tmp_rs_list.length && (
             rs_list = tmp_rs_list
-            .filter(r=>r.match(srcQuoteReg))
+            .filter(r=>(r && r.match(srcQuoteReg)))
             .map(v=>v.match(srcQuoteReg)[0])
             .filter(r=>{
                 // remove the http:xxx.com/xx
@@ -844,6 +856,11 @@ gulp.task('gm:update-js', ['gm:update-es6'], ()=>{
 })
 
 
+gulp.task('gm:update-tpl', ()=>{
+    return do_browserify()
+})
+
+
 gulp.task('gm:develop', ['gm:compile'], ()=>{
 
     let _cmdBase = {
@@ -975,9 +992,15 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
             sh.cp('-rf', epath, f.dirPath)
             gmutil.tip('Copy Raw File To: '+f.tarPath)
 
-            if(file_extname == '.js') {
+            // 复制js和tpl模板文件
+            if(file_extname == '.js' || file_extname == '.tpl') {
                 sh.cp('-rf', epath, tmp_f.dirPath)
                 gmutil.tip('Copy Raw File To: '+tmp_f.tarPath)
+
+                if(file_extname == '.tpl'){
+                    // the tpl need re-browserify
+                    fireUpdate('tpl', event)
+                }
             }
 
             // check relevancy images
@@ -1145,7 +1168,7 @@ gulp.task('gm:rev-source', ()=>{
         // 禁止参与重命名的文件  
         dontRenameFile: ['.html', /^\/favicon.ico$/],  
         // 无需关联处理文件  
-        dontGlobal: [ /^\/favicon.ico$/, '.txt', '.tpl'],  
+        dontGlobal: [ /^\/favicon.ico$/, '.txt' /*'.tpl'*/],  
         // 该项配置只影响当前src的静态资源中 绝对路径的资源引用地址  
         // prefix: _opts['is_absolute'] ? _opts['cdn_prefix'] : '' 
     })
