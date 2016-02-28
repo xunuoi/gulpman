@@ -352,6 +352,22 @@ import 'react'
 ```
 
 
+###9. 如何使用前端js模板
+* 支持tpl扩展名，放到components相关目录下即可，js 可以直接require或者import
+* 最终会作为字符串格式打包进js
+* tpl中仍然支持资源嵌入和图片base64等，如参照前面_gm_inline等语法即可
+
+- import到es6中
+```js
+    import dialogTpl from './dialog.tpl'
+```
+
+- 或者使用require语法
+```js
+    var dialogTpl = require('./dialog.tpl')
+```
+
+
 
 
 ###教程
