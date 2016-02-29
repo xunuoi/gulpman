@@ -75,29 +75,25 @@ var gulp = require('gulp'),
 gman.config({
     
     // 是否使用绝对路径，默认值true, 推荐使用，方便服务器配置。比如`/static/home/main.js`这种风格。
-
-    // 如果无服务端情况下，本地调试，推荐设置is_absolute为false, 那么会是类似`../../assets/static/home/main.js`这种风格。
-    这种情况直接打开html文件就可以正常浏览和运行！
-
-    // `is_absolute` 具体取决于项目情况、服务端配置等。
-    // if set the assets url prefix as absolute or relative, default: true
+    // 如果无服务端情况下，本地调试，可以设置is_absolute为false, 那么会是类似`../../assets/static/home/main.js`这种风格
     'is_absolute': true,
 
-    // cdn prefix 配置CDN
-    'cdn_prefix': '', // 支持 字符串/数组/函数
+    // cdn prefix 配置CDN， 支持［字符串|数组|函数］ 3中传参方式
+    'cdn_prefix': '', 
 
-    // 配置资源URL前缀，建议 /xxx这种
+    // 配置资源URL前缀，建议类似 /static这种
     // usually set as /static, this involves the server config ,such as the static path of nginx
     'url_prefix': '/static' 
 
 
-    // use spritesmith for css-img sprite
-    // 基于spritesmith实现, 详细参见https://github.com/Ensighten/spritesmith
-    // 传递自动生成雪碧图的spritesmit的options
-    'spritesmith': { },
+    /** use spritesmith for css-img sprite
+     * 基于spritesmith实现, 详细参见https://github.com/Ensighten/spritesmith
+     * 传递自动生成雪碧图的spritesmit的options
+     **/
+    //'spritesmith': { },保持默认即可
     
-    // usemin config 配置usemin
-    'usemin': {}
+    /** usemin config 配置usemin,保持默认即可 **/
+    // 'usemin': {}
 
 
     // 模块COMPONENTS目录，同一个模块的html和资源文件在一起。默认 'components'即可
@@ -134,10 +130,9 @@ gman.config({
 
 ```Javascript
 
-'cdn_prefix': function (mediaFile, hostFile) {
+'cdn_prefix': function (fileName) {
         
-        gulpman.util.warn(mediaFile)
-        gulpman.util.warn(hostFile)
+        console.log(fileName)
 
         var c_list = [
             'http://s0.com', 
