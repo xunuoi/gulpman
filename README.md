@@ -124,9 +124,7 @@ gman.config({
 
 * `cdn_prefix`支持 字符串、数组、函数
 * 如果传入数组，那么按照随机来分配
-* 如果传入函数，函数会获得两个参数，`mediaFile`和`hostFile`
-* `hostFile`是当前正在处理的html/CSS文件
-* `mediaFile`是指在`hostFile`中被引用的资源文件
+* 如果传入函数，函数会获1个参数，`mediaFile`, 就是当前被css或html中引用到的资源文件名，可以根据文件名做cdn分配
 
 ```Javascript
 
