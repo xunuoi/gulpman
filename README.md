@@ -69,7 +69,7 @@ var gulp = require('gulp'),
 /**
  * 配置gulpman ======================
  * Use config API
- * 设置路径、CDN、资源URL前缀等，API超级简单
+ * 设置路径、CDN、资源URL前缀等，API简单
  */
 
 gman.config({
