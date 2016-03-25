@@ -14,7 +14,7 @@ fi
 
 # change dir to install local gulp
 cd ../..
-npm install gulp --save-dev
+npm install gulp
 # install babel preset
 npm install babel-preset-es2015 --save
 npm install babel-preset-react --save
