@@ -17,6 +17,5 @@
   "author": "Gulpman",
   "license": "MIT",
   "dependencies": {
-    "gulpman": "^latest"
   }
 }
