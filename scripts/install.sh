@@ -2,31 +2,38 @@
 
 echo "\n\n*Check whether the gulp is installed in global:"
 
-gulp -v >/dev/null 2>&1
+# gulp -v >/dev/null 2>&1
 
-if [ $? -eq 0 ];then
-    echo "\n*gulp has been installed"
-else
-    echo "\n*gulp is not installed, now install gulp"
-    npm install --global gulp-cli
-fi
+# if [ $? -eq 0 ];then
+#     echo "\n*gulp has been installed"
+# else
+#     echo "\n*gulp is not installed, now install gulp"
+#     npm install --global gulp-cli
+# fi
+
+
+npm rm --global gulp
+npm install --global gulp-cli
 
 
 # change dir to install local gulp
 cd ../..
-npm install gulp
+npm install --save-dev gulp
+echo "\n*Install local gulp Completed! \n"
+
+echo "\n*Now Install the babel preset \n"
 # install babel preset
 npm install babel-preset-es2015 --save
 npm install babel-preset-react --save
 cd -
-echo "\n*Install local gulp Completed!\n"
+
 
 
 # check if the user want use cnpm. Chinese Mainland Recommend
 
 while :  # loop
 do
-if read -t 3 -n 1 -p "*Do you want install cnpm ?(Mainland China Recommend) [Y/N]:"  #limited time 5s  
+if read -t 5 -n 1 -p "*Do you want install cnpm ?(Mainland China Recommend) [Y/N]:"  #limited time 5s  
     then
         case $REPLY in
             Y|y) #Y
