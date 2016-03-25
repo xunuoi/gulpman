@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# @author: Lucas
+# @mail: xwlxyjk@gmail.com
+
+
+# init the package.json is not existed
+cp ./scripts/package.json ../../
+
+
 echo "\n\n*Check whether the gulp is installed in global:"
 
 # gulp -v >/dev/null 2>&1
@@ -11,13 +19,13 @@ echo "\n\n*Check whether the gulp is installed in global:"
 #     npm install --global gulp-cli
 # fi
 
-
-npm rm --global gulp
-npm install --global gulp-cli
+# npm rm --global gulp
+# npm install --global gulp-cli
 
 
 # change dir to install local gulp
 cd ../..
+echo "\n*Now Install Local gulp: \n"
 npm install --save-dev gulp
 echo "\n*Install local gulp Completed! \n"
 

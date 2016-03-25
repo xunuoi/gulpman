@@ -1,0 +1,22 @@
+{
+  "name": "Project",
+  "version": "1.0.0",
+  "description": "Gulpman Project",
+  "engines": {
+    "node": ">=4.2.0"
+  },
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gulpman/proj.git"
+  },
+  "keywords": [
+    "gulpman",
+  ],
+  "author": "Gulpman",
+  "license": "MIT",
+  "dependencies": {
+    "gulpman": "^latest"
+  }
+}
