@@ -1,7 +1,7 @@
 {
   "name": "Project",
   "version": "1.0.0",
-  "description": "Gulpman Project",
+  "description": "Gulpman Project, update this description",
   "engines": {
     "node": ">=4.2.0"
   },
@@ -13,9 +13,11 @@
   },
   "keywords": [
     "gulpman",
+    "karat.cc"
   ],
   "author": "Gulpman",
   "license": "MIT",
   "dependencies": {
+    "gulp": "^3.9.0"
   }
 }
