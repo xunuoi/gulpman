@@ -10,14 +10,14 @@ cp ./scripts/package.json ../../
 
 echo "\n\n*Check whether the gulp is installed in global:"
 
-# gulp -v >/dev/null 2>&1
+gulp -v >/dev/null 2>&1
 
-# if [ $? -eq 0 ];then
-#     echo "\n*gulp has been installed"
-# else
-#     echo "\n*gulp is not installed, now install gulp"
-#     npm install --global gulp-cli
-# fi
+if [ $? -eq 0 ];then
+    echo "\n*gulp has been installed"
+else
+    echo "\n*gulp is not installed, now install gulp"
+    npm install --global gulp-cli
+fi
 
 # npm rm --global gulp
 # npm install --global gulp-cli
@@ -25,9 +25,9 @@ echo "\n\n*Check whether the gulp is installed in global:"
 
 # change dir to install local gulp
 cd ../..
-# echo "\n*Now Install Local gulp: \n"
-# npm install --save-dev gulp
-# echo "\n*Install local gulp Completed! \n"
+echo "\n*Now Install Local gulp: \n"
+npm install --save-dev gulp
+echo "\n*Install local gulp Completed! \n"
 
 echo "\n*Now Install the babel preset \n"
 # install babel preset
