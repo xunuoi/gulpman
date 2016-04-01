@@ -217,9 +217,9 @@ let sass_source,
 // init vars
 function initVars(){
     
-    _opts['dist_static'] = j(_opts['dist_assets'], _opts['url_prefix'])
+    _opts['dist_static'] = j(_opts['dist_assets'] /*, _opts['url_prefix']*/ )
 
-    _opts['runtime_static'] = j(_opts['runtime_assets'], _opts['url_prefix'])
+    _opts['runtime_static'] = j(_opts['runtime_assets'] /*, _opts['url_prefix']*/ )
 
     _opts['runtime_static_tmp'] = j(_opts['runtime_assets'], '.tmp_raw_static')
 
@@ -508,15 +508,28 @@ function storeCheck(filepath, dbType, handlerType, evtObj){
 
 
 // Main Tasks =====================================
+function safeClean(path) {
+    if (!path.replace(/[.\/]+/g, '')) {
+        return ''
+    } else {
+        return path
+    }
+}
+
 
 gulp.task('gm:clean', ()=>{
     sh.rm('-rf', [
 
-        _opts['runtime_views'],
-        _opts['dist_views'],
+        safeClean(_opts['runtime_views']),
+        safeClean(_opts['dist_views']),
 
-        _opts['runtime_assets'],
-        _opts['dist_assets']
+        safeClean(_opts['runtime_static']),
+        safeClean(_opts['dist_static']),
+
+        safeClean(_opts['runtime_static_tmp']),
+
+        safeClean(_opts['runtime_assets']),
+        safeClean(_opts['dist_assets']),
 
     ])
 })
@@ -557,6 +570,7 @@ function compile_sass(singleFile){
     .pipe(base64({
         'is_absolute': _opts['is_absolute'],
         'baseDir': _opts['runtime_static'],
+        'url_prefix': _opts['url_prefix'],
         'components': _opts['components'],
         'isDevelop': isDevelop,
         // the current files type
@@ -887,6 +901,7 @@ function htmlParseFlow(b, _isRuntimeDir){
     return b.pipe(base64({// 第二步，替换生成html原本内容本身中的base64图片路径, 比如img标签中有?_gm_inline则被替换为base64
         'is_absolute': _opts['is_absolute'],
         'baseDir': _opts['runtime_assets'],
+        'url_prefix': _opts['url_prefix'],
         'views': _isRuntimeDir ? _opts['runtime_views'] : _opts['dist_views'],
         'dist_assets': _opts['dist_assets'],
         'isDevelop': isDevelop,
@@ -910,6 +925,7 @@ function htmlParseFlow(b, _isRuntimeDir){
 
         'dist_dir': _opts['dist_assets'],
         'runtime_dir': _opts['runtime_assets'],
+        'url_prefix': _opts['url_prefix'],
 
         'root': _cwd
     }))
