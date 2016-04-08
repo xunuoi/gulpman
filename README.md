@@ -19,7 +19,7 @@
 - 支持前端js模板嵌入，`tpl`格式的直接构建打包到最终js文件
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改简单
 - 扩展性高，`gulp`现有的插件都可以拼装、加入到`gulpman`中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合`browser-sync`到构建系统中。
-- 整合karma单元测试框架，适配babel和es6的代码单元测试和coverage
+- 整合`karma`单元测试框架，适配`babel和es6`的代码单元测试和`coverage`
 
 
 
@@ -365,9 +365,9 @@ import 'react'
 
 
 ###10. 如何启用karma单元测试
-* 初次使用先安装，运行`gulp gm:karma:install`
-* 测试spec的es6文件，放置到目录中的spec文件夹中，可以自行配制在karma.conf.js中
-＊ 运行 `gm:karma:start` 来启动单元测试，完成后可以在coverage文件夹中查看覆盖率结果
+* 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
+* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，完成后可以在coverage文件夹中查看覆盖率结果
+* spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置
 
 
 
