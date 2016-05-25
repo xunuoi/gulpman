@@ -138,7 +138,8 @@ let _opts = {
 
     // define babel optionals
     'babel': {
-        'presets': ['es2015', 'react']
+        'presets': ['es2015', 'react'],
+        'sourceMaps': 'inline'
     },
 
     // library path and global module path
@@ -560,6 +561,7 @@ function compile_sass(singleFile){
     // gmutil.tip('*Compile SCSS: '+_sass_source)
 
     return gulp.src(_sass_source)
+    .pipe(p.sourcemaps.init())
     .pipe(p.sass())
     .on('error', function(err){
         // console.log(err)
@@ -567,6 +569,7 @@ function compile_sass(singleFile){
         // this.end()
         this.emit('end')
     })
+    .pipe(p.sourcemaps.write())
     .pipe(base64({
         'is_absolute': _opts['is_absolute'],
         'baseDir': _opts['runtime_static'],
