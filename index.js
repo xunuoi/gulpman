@@ -166,6 +166,7 @@ let _opts = {
         inlinejs: [ p.uglify ],
         // inlinecss: [ p.cssnano ]
     },
+    'iconfont': {},
     'cssnano': {
         discardUnused: {
             fontFace: false
