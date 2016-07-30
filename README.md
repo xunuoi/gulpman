@@ -5,7 +5,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/gulpman.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
 <img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.png?style=flat-square" width="90" alt="Build status" />
-<img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.png?style=flat-square" width="106" alt="Coverage Status" />
 
 
 # gulpman
@@ -366,8 +365,9 @@ import 'react'
 
 ###10. 如何启用karma单元测试
 * 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
-* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，完成后可以在coverage文件夹中查看覆盖率结果
-* spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置
+* 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
+* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果
+* 指定spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置、定制等
 
 
 
