@@ -1582,7 +1582,7 @@ gulp.task('gm:init', p.sequence(
 gulp.task('gm:karma:install', ()=>{
     sh.exec('npm install karma karma-browserify karma-coverage karma-jasmine karma-chrome-launcher browserify-istanbul babel-preset-es2015 babel-preset-react babelify babel-istanbul watchify stringify --save-dev')
 
-    sh.cp('./node_modules/gulpman/karma/karma.conf.js ./')
+    sh.cp('./node_modules/gulpman/karma/karma.conf.js', './')
 })
 
 gulp.task('gm:karma:start', ()=>{
