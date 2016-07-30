@@ -5,7 +5,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/gulpman.svg?style=flat-square)](http://badge.fury.io/js/gulpman)
 <img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/build.png?style=flat-square" width="90" alt="Build status" />
-<img src="https://raw.githubusercontent.com/xunuoi/gulpman/master/assets/coverage.png?style=flat-square" width="106" alt="Coverage Status" />
 
 
 # gulpman
@@ -28,7 +27,7 @@
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
 - Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语句
-- *注意目前对于npm 3版本以上(目前大家基本都是2.x)，需要手动补装下gulp-sass等几个依赖
+- *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react`等几个依赖
 
 
 ##Install 安装
@@ -366,8 +365,9 @@ import 'react'
 
 ###10. 如何启用karma单元测试
 * 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
-* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，完成后可以在coverage文件夹中查看覆盖率结果
-* spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置
+* 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
+* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果
+* 指定spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置、定制等
 
 
 
