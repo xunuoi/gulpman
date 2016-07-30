@@ -1303,7 +1303,8 @@ function setRevReplace(){
     return revReplace({
         'manifest': manifest,
         // 如果is_absolute为false, 那么不启用cdn_prefix
-        'prefix': _opts['is_absolute'] ? _opts['cdn_prefix'] : ''
+        'prefix': _opts['is_absolute'] ? _opts['cdn_prefix'] : '',
+        'url_prefix': _opts['url_prefix']
     })
 }
 
