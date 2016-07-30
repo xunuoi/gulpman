@@ -165,6 +165,11 @@ let _opts = {
         js: [ p.uglify, p.rev ],
         inlinejs: [ p.uglify ],
         // inlinecss: [ p.cssnano ]
+    },
+    'cssnano': {
+        discardUnused: {
+            fontFace: false
+        }
     }
 
 }
@@ -175,7 +180,7 @@ const base_source_type = 'js,css',
     img_source_type = 'png,PNG,jpg,JPG,gif,GIF,jpeg,JPEG,webp,WEBP,bmp,BMP',
     img_source_reg = img_source_type.split(',').join('|'),
     jstpl_source_type = 'tpl',
-    font_source_type = 'svg,SVG,tiff,ttf,woff,eot',
+    font_source_type = 'svg,SVG,tiff,ttf,woff,woff2,eot',
     other_source_type = 'txt,mp3,mp4,ogg,webm,mpg,wav,wmv,mov,ico',
 
     // the pure raw souce means the source do not need gulp deal at all!
@@ -1314,7 +1319,7 @@ function setRevReplace(){
 gulp.task('gm:cssmin', ()=>{
     // 除去lib
     return gulp.src([css_source, except_lib_source])
-    .pipe(p.cssnano())
+    .pipe(p.cssnano(_opts['cssnano']))
     .pipe(gulp.dest(_opts['dist_static']))
 })
 
@@ -1381,7 +1386,7 @@ gulp.task('gm:rev-copy-lib', ()=>{
 // minify the lib css
 gulp.task('gm:lib-mincss', ()=>{
     return gulp.src(j(dist_lib_path, '**/*.css'))
-    .pipe(p.cssnano())
+    .pipe(p.cssnano(_opts['cssnano']))
     .pipe(gulp.dest(dist_lib_path))
 })
 
@@ -1588,6 +1593,15 @@ gulp.task('gm:karma:install', ()=>{
 gulp.task('gm:karma:start', ()=>{
     sh.exec('./node_modules/karma/bin/karma start')
 });
+
+/**
+ * For plugins tasks
+ */
+gulp.task('gm:iconfont:install', ()=>{
+    sh.exec('npm install gulp-iconfont gulp-iconfont-css --save-dev')
+})
+
+require('./lib/iconFonter').registerTask(gulp, _opts)
 
 // API ================================
 
