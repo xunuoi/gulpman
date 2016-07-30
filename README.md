@@ -365,7 +365,7 @@ import 'react'
 ###10. 使用iconfont转换
 * 可以将svg转换成icon-font，用`@font-face`方式引用
 * 初次使用先安装，运行`gulp gm:iconfont:install`
-* 将svg文件放到`components/iconfonts/source`目录下
+* 将svg文件放到`components/iconfonts/source`目录下，运行`gulp gm:iconfont`即可
 * 自动生成的icon-font和css文件将会在`iconfonts/gmicon`目录下
 
 
