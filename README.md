@@ -27,7 +27,7 @@
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
 - Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语句
-- *注意目前对于npm 3版本以上(目前大家基本都是2.x)，需要手动补装下gulp-sass等几个依赖
+- *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react`等几个依赖
 
 
 ##Install 安装
