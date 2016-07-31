@@ -14,6 +14,7 @@
 - 支持图片`base64`方式嵌入到`html/CSS`
 - 支持`JS/CSS`内联方式嵌入html文件
 - 整合`spritesmith`，简单生成sprite雪碧图
+- 整合`icon-font`转换，支持svg转换
 - 整合`usemin`，构建合并更加灵活强大
 - 支持前端js模板嵌入，`tpl`格式的直接构建打包到最终js文件
 - 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改简单
@@ -365,7 +366,7 @@ import 'react'
 ###10. 使用iconfont转换
 * 可以将svg转换成icon-font，用`@font-face`方式引用
 * 初次使用先安装，运行`gulp gm:iconfont:install`
-* 将svg文件放到`components/iconfonts/source`目录下
+* 将svg文件放到`components/iconfonts/source`目录下，运行`gulp gm:iconfont`即可
 * 自动生成的icon-font和css文件将会在`iconfonts/gmicon`目录下
 
 
