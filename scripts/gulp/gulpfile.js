@@ -36,8 +36,8 @@ gulpman.config({
 
 
     // develop和publish下的assets静态目录，跟服务器配置有关，比如nginx的static目录指向
-    //'runtime_assets': 'assets',
-    //'dist_assets': 'assets_dist',
+    //'runtime_assets': 'assets/static',
+    //'dist_assets': 'assets_dist/static',
 
 
     // 第三方JS类库、模块的目录，推荐设置为`lib`或`bower_components`（这样bower可以直接安装到这个目录）
