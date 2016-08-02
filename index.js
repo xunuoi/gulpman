@@ -109,6 +109,7 @@ let gulp = require('gulp'),
     store = require('./lib/store'),
     htmlInline = require('./lib/inline'),
     revReplace = require('./lib/revReplace'),
+    gulpUsemin = require('./lib/gulp-usemin'),
 
     assetsPathParser = require('./lib/assetsPathParser'),
     htmlPathParser = require('./lib/htmlPathParser.js'),
@@ -158,12 +159,12 @@ let _opts = {
     // for sprite
     // 'spritesmith': {}
 
-    // for usemin
+    // for usemin. No need rev here, by global rev.
     'usemin': {
-        css: [ p.rev ],
+        // css: [ p.rev ],
         // html: [ function () {return minifyHtml({ empty: true });} ],
-        js: [ p.uglify, p.rev ],
-        inlinejs: [ p.uglify ],
+        // js: [ p.uglify, p.rev ],
+        inlinejs: [ p.uglify ]
         // inlinecss: [ p.cssnano ]
     },
     'iconfont': {},
@@ -224,6 +225,8 @@ let sass_source,
 // init vars
 function initVars(){
     
+    _opts['usemin']['url_prefix'] = _opts['url_prefix']
+
     _opts['dist_static'] = j(_opts['dist_assets'] /*, _opts['url_prefix']*/ )
 
     _opts['runtime_static'] = j(_opts['runtime_assets'] /*, _opts['url_prefix']*/ )
@@ -819,7 +822,7 @@ gulp.task('gm:publish-usemin', ()=>{
 
 
     return gulp.src(html_src)
-    .pipe(p.usemin(_opts['usemin']))
+    .pipe(gulpUsemin(_opts['usemin']))
     .pipe(gulp.dest(_opts['dist_views']))
 
 })
@@ -1293,7 +1296,7 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
     isWatching = true
 
     gmutil.tip('\n*Now Watching For Development:\n')
-    OSInform('Ready For Development', 'Go!')
+    OSInform('Ready For Development', 'Start')
      
 })
 
@@ -1507,7 +1510,7 @@ gulp.task('gm:publish-mode', ()=>{
 
 
 gulp.task('gm:osinform', ()=>{
-    OSInform('Publish Succeed', 'Enjoy!')
+    OSInform('Publish Succeed', 'Completed')
 })
 
 // publish source ,based on the runtime source
@@ -1566,7 +1569,7 @@ gulp.task('gm:generate-meta', ()=>{
 gulp.task('gm:open-demo', ()=>{
     sh.exec('open '+j(_opts['runtime_views'], 'home/index.html')+_echo_off)
 
-    OSInform('Init Succeed', 'Enjoy!')
+    OSInform('Init Succeed', 'Completed')
 })
 
 

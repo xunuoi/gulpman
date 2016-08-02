@@ -1,0 +1,78 @@
+{
+  "name": "gulp-usemin",
+  "version": "0.3.23",
+  "description": "Replaces references to non-optimized scripts or stylesheets into a set of HTML files (or any templates/views).",
+  "main": "index.js",
+  "dependencies": {
+    "gulp-util": "~2.2.14",
+    "through2": "~0.5.1",
+    "glob": "~4.0.4",
+    "gulp-concat": "~2.4.1"
+  },
+  "devDependencies": {
+    "event-stream": "~3.1.0",
+    "vinyl-fs": "~2.3.1",
+    "gulp": "~3.8.6",
+    "gulp-jshint": "~1.7.0",
+    "gulp-mocha": "~0.5.1",
+    "gulp-uglify": "~0.3.1",
+    "gulp-minify-html": "~0.1.1",
+    "gulp-minify-css": "~0.3.0",
+    "gulp-rev": "~0.4.2",
+    "gulp-less": "2.0.1"
+  },
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zont/gulp-usemin.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "usemin",
+    "gulp-usemin"
+  ],
+  "author": {
+    "name": "Alexander Zonov",
+    "email": "zont@pochta.ru"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zont/gulp-usemin/issues"
+  },
+  "engines": {
+    "node": ">=0.12"
+  },
+  "gitHead": "81bff9fd6d46f9fbedea53e349001d0fa7bcb49c",
+  "homepage": "https://github.com/zont/gulp-usemin#readme",
+  "_id": "gulp-usemin@0.3.23",
+  "_shasum": "9f451546e4ac53a00119c7343d36c42d6a5ce6f0",
+  "_from": "gulp-usemin@>=0.3.21 <0.4.0",
+  "_resolved": "https://registry.npm.taobao.org/gulp-usemin/download/gulp-usemin-0.3.23.tgz",
+  "_npmVersion": "3.3.10",
+  "_nodeVersion": "5.0.0",
+  "_npmUser": {
+    "name": "alexander.zonov",
+    "email": "zont@pochta.ru"
+  },
+  "dist": {
+    "shasum": "9f451546e4ac53a00119c7343d36c42d6a5ce6f0",
+    "size": 12939,
+    "noattachment": false,
+    "tarball": "http://registry.npm.taobao.org/gulp-usemin/download/gulp-usemin-0.3.23.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "alexander.zonov",
+      "email": "zont@pochta.ru"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/gulp-usemin-0.3.23.tgz_1462364006265_0.13037881650961936"
+  },
+  "directories": {},
+  "publish_time": 1462364007542,
+  "_cnpm_publish_time": 1462364007542
+}
