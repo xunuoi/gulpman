@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.8.21",
+  "version": "1.8.22",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.2.0"
@@ -39,11 +39,13 @@
   },
   "dependencies": {
     "gulp-babel": "^6.1.2",
+    "browserify": "^13.1.0",
     "stringify": "^5.1.0",
     "colors": "^1.1.2",
     "event-stream": "^3.3.2",
     "globby": "^6.0.0",
     "gulp-cssnano": "^2.1.2",
+    "gulp-imagemin": "^3.0.2",
     "gulp-load-plugins": "^1.2.4",
     "gulp-concat": "^2.6.0",
     "gulp-rename": "^1.2.2",
@@ -51,7 +53,7 @@
     "gulp-sequence": "^0.4.4",
     "gulp-uglify": "^2.0.0",
     "gulp-sourcemaps": "^1.6.0",
-    "imagemin-pngquant": "^5.0.0",
+    "imagemin-pngquant": "^4.2.2",
     "readable-stream": "^2.0.5",
     "object-assign": "^4.0.1",
     "shelljs": "^0.5.3",
