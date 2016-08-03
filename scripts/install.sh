@@ -26,7 +26,7 @@ fi
 # change dir to install local gulp
 cd ../..
 echo "\n*Now Install Local gulp: \n"
-npm install --save-dev gulp
+npm install gulp --save-dev
 echo "\n*Install local gulp Completed! \n"
 
 echo "\n*Now Install the babel preset \n"
