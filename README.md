@@ -27,7 +27,7 @@
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
-- Node版本需要不低于4.2.0，如果要兼容0.1x的旧版本nodejs，请考虑修改或转换`index.js`、`lib`等目录和文件中源码的ES6语句
+- Node版本需要不低于4.0.0
 - *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react`等几个依赖
 
 
@@ -39,6 +39,8 @@
 * 可以使用 `sudo chown -R "$(whoami)"`+`路径`来修复
 * 不要使用`sudo npm install`来手工安装因为权限问题而失败的模块。请修改权限后，再用`npm install`来安装即可
 * 如果你本地node和npm的安装和权限正常，那gulpman的安装过程应该都是顺利和成功的。
+* 图片压缩模块imagemin-pngquant需要依赖`libpng-devel`，如果是Linux环境，建议先运行`yum install libpng-devel`来确保安装
+* 安装过程中无故退出，请查看`npm-debug.log`，检查是否是内存不足`ENOMEM`导致。
 
 
 
