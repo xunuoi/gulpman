@@ -545,6 +545,25 @@ gulp.task('gm:clean', ()=>{
 })
 
 // clean dir includes components
+gulp.task('gm:clean-full', ['gm:clean'],()=>{
+    var pSep = '/' //path.sep
+
+    var runtime_assetsRoot = path.normalize(_opts['runtime_assets']).split(pSep)[0]
+    var dist_assetsRoot = path.normalize(_opts['dist_assets']).split(pSep)[0]
+
+    var runtime_viewsRoot = path.normalize(_opts['runtime_views']).split(pSep)[0]
+    var dist_viewsRoot = path.normalize(_opts['dist_views']).split(pSep)[0]
+
+    sh.rm('-rf', [
+        runtime_assetsRoot,
+        dist_assetsRoot,
+
+        runtime_viewsRoot,
+        dist_viewsRoot
+    ])
+})
+
+// clean dir includes components
 gulp.task('gm:clean-all', ['gm:clean'],()=>{
     sh.rm('-rf', [
         _opts['components'],
