@@ -218,6 +218,7 @@ let sass_source,
 
     dist_html_source,
     dist_css_source,
+    dist_js_source,
     dist_tpl_source,
     dist_all_raw_source
 
@@ -259,6 +260,7 @@ function initVars(){
     // dist source path
     dist_html_source = j(_opts['dist_views'], '**/*.html')
     dist_css_source = j(_opts['dist_static'], '**/*.css')
+    dist_js_source = j(_opts['dist_static'], '**/*.js')
     dist_tpl_source = j(_opts['dist_static'], '**/*.tpl')
     dist_all_raw_source = j(_opts['dist_assets'], '**/*.{'+all_raw_source_type+'}')
 
@@ -1375,6 +1377,26 @@ gulp.task('gm:jsmin', ()=>{
 })
 
 
+gulp.task('gm:rev-js', ()=>{
+    return gulp.src(dist_js_source)
+        .pipe(setRevReplace())
+        .pipe(assetsPathParser.absolutizePath({
+            // replace relative path to absolute path
+            'cwd': _cwd,
+            // add for tpl parse
+            '_opts': _opts,
+            // related to final url
+            '_isRuntimeDir': false,
+            'all_raw_source_reg': all_raw_source_reg,
+            // end for tpl parse
+            'is_absolute': _opts['is_absolute'],
+            'static_dir': _opts['runtime_static'],
+            'cdn_prefix': _opts['cdn_prefix'],
+            'url_prefix': _opts['url_prefix'],
+            'components': _opts['components']
+        }))
+        .pipe(gulp.dest(_opts['dist_static']))
+})
 
 
 /**
@@ -1388,7 +1410,7 @@ gulp.task('gm:rev', p.sequence(
     'gm:publish-usemin',
 
     'gm:rev-source', 
-    ['gm:rev-html', 'gm:rev-css'])
+    ['gm:rev-html', 'gm:rev-css', 'gm:rev-js'])
 )
 
 
