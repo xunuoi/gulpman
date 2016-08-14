@@ -107,7 +107,7 @@ gman.config({
     'runtime_views': 'views',
     'dist_views': 'views_dist',
 
-    // develop和publish下的assets静态目录，跟服务器配置有关，比如nginx的static目录指向
+    // develop和publish下的assets静态目录，跟服务器配置有关，比如nginx的static目录指向，请保持与服务器设定一致。支持多级路径设定，比如assets/public
     'runtime_assets': 'assets',
     'dist_assets': 'assets_dist',
 

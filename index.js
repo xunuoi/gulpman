@@ -79,8 +79,8 @@ let _opts = {
     'runtime_views': './views',
     'dist_views': './views_dist',
 
-    'runtime_assets': './assets/static',
-    'dist_assets': './assets_dist/static',
+    'runtime_assets': './assets',
+    'dist_assets': './assets_dist',
 
     // for sprite
     // 'spritesmith': {}
