@@ -249,22 +249,15 @@ gulp gm:develop -c home
 ```
 
 
-
 ###3. 如何在gulpman下使用React
-
-* 方法一：通过script标签引入React类库到HTML (推荐)
-
-```html
-<script type="text/javascript" src="./lib/react-0.14.6/build/react.min.js"></script>
-<script type="text/javascript" src="./lib/react-0.14.6/build/react-dom.min.js"></script>
-```
-
-* 方法二：直接在ES6/JSX文件中引入React模块
-
-注意：引入的react文件是为Gulpman预置的，已经修改过来兼容browserify，从而在window中暴露React和ReactDOM对象供开发者调用：
+* 安装React: `npm install react react-dom`
+* 在ES6文件中使用
 
 ```Javascript
-import 'react'
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+// xxx
 ```
 
 
