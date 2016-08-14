@@ -5,80 +5,6 @@
  * xwlxyjk@gmail.com
  */
 
-
-/**
- * *** FOR GULPMAN ***
- * ===============================================
- */
-
-/**
- * Update 1
- * @Date(2016/2/28)
- *
- * 1. 对CSS/tpl/html中的资源定位已经完成，包括tpl模块嵌入后的md5
- * 2. 后续考虑增加html中的link引入html块功能(类似模板include)
- * 3. 后续考虑js中资源定位
- * 4. 目前不再考虑纯粹相对路路径来正常加载所有资源，目前html内的相对路径是可用的。所以正式产品开发要使用 is_absolute
- *
- * 5. assetPathParser跟htmlPathParser有重复代码，考虑做复用
- */
-
-
-
-/**
- * 问题 ISSUES:
- * @Date(2016/2/27)
- * 
- * 1. js中资源嵌入功能，比如图片的src资源嵌入或者再js中嵌入css文件，可以用标记字符实现，比如在js中定义变量 var logoImgSrc = './img/a.png?_gm_src'，那么在构建过程中，将带?_gm_src的字符串替换成构建后的真实相对路径，比如变成了'./img/a-8d4afc.png'。如果不带有_gm_src标记，将不会替换
- *
- * 2. js中图片资源转换inline的base64功能，比如将 var logoImgSrc = './img/a.png?_gm_inline'，最后转换完成后，logoImgSrc = 'xxx'，得到一份完整的base64的编码字符串。如果不带有_gm_inline标记，将不会替换
- * 
- *
- * 3. 全局内容的绝对路径，主要是可能是css和tpl和js，比如css 中的 ./img/a.png ，最后都能转换成 /static/home/img/a.png，这样cdn功能也更加完整可用。同时将会解决[4]的问题。
- *
- * 4. html的inline内容嵌入时，引用资源的路径转换问题。比如css中./a.png需要转成 ../../assets/static/home/a.png才能正常，js也会有类似inline后引用的资源的问题。解决方法可以是做转换 (全局绝对路径下无需转换)。相对路径转换的算法，大致是计算a.html到a.css路径：html_css_path，然后计算从a.css到a.css中引入的a.png路径：css_media_path，那么最终在html文件中inline的a.png的路径就是path.join(html_css_path, css_media_path)，注意除了图片，还有可能是font，比如svg、eot之类的资源
- *
- * 5. js资源定位处理的流程，可考虑添加到compile-es6和update-es6，支队es6或者jsx文件有效。
- * 
- * 6. 对css和tpl和js文件内容中的资源url全局绝对路径处理，可以放到compile-css结束前和compile-es6/update-es6 结束前，去替换其中的资源url为全局，这样后面parseRawHTML中做inline时候就已经是绝对路径了，不需要再做inline时候路径转换，所以这个处理顺序是对的。
- *
- * 7. css中引用的资源url可能包括 img/font-face。
- *    js中引用的资源src可能包括 css/img/other(比如任意文件引用)
- *    html中引用的资源可能包括 css/js/img/video/audio
- *    [目前html中的绝对路径/相对路径已完成，css和js未做绝对路径]
- *
- *
- * 
- * 综合 TO DO：
- * 
- * a. 当`is_absolute`为true的时候，开启全局(包括html/css/js/tpl)绝对路径，否则使用相对路径。目前只有html中能启用全局url
- * b. 如果未开启全局，使用相对路径，那么inline的时候给引用的资源url做路径转换，算法参见[4]
- * c. 在a, b基础上，解决上面[1]和[2]提到的js中资源嵌入功能
- *
- * 
- */
-
-
-
-/**
- * ### Develop Description
- * 1. 先将静态资源文件的源文件scss, less, es6等，编译输出到asset runtime目录
- * 2. 将模板html文件，更新资源url后输出到 components runtime 目录
- * 3. 进入watch模式，如果有变动，那么更新。
- * 4. watch模式，如果是编译型资源，比如scss, es6等，那么更新输出资源、更新打包等。如果是raw资源，直接复制。
- */
-
-/**
- * ### Production Description
- * 1. 先执行Develop的初始化,生成runtime 资源目录
- * 2. 以runtime目录作为资源，压缩图片、压缩混淆打包JS\CSS等资源
- * 3. 对dist目录中资源及其引用，进行MD5资源重命名，更新html和css、js等有资源引用的文件。
- * 4. 最后重新输出到 components dist目录和assets dist目录
- * 5. md5和非md5文件目前是混合在一起的
- */
-
-
-
 // =======================================
 
 
@@ -490,16 +416,6 @@ function spriteCSS(entry) {
         this.end() 
     })
     //这里用通用的traversal解决了
-    /*.pipe(assetsPathParser.absolutizePath({
-        // replace relative path to absolute path
-        
-        'cwd': _cwd,
-        'is_absolute': _opts['is_absolute'],
-        'static_dir': _opts['runtime_static'],
-        'cdn_prefix': _opts['cdn_prefix'],
-        'url_prefix': _opts['url_prefix'],
-        'components': _opts['components']
-    }))*/
     .pipe(gulp.dest('./'))
 
 }
@@ -737,6 +653,21 @@ gulp.task('gm:compile-es6', ()=>{
         // 这里有一部分是从es6转成的.js，也有一部分是jsx转成的.js
         // 此处都统一扩展名设置为.es6，方便后面browserify打包
         path.extname = '.es6'
+    }))
+    .pipe(assetsPathParser.absolutizePath({
+        // replace relative path to absolute path
+        'cwd': _cwd,
+        // add for tpl parse
+        '_opts': _opts,
+        // related to final url
+        '_isRuntimeDir': false,
+        'all_raw_source_reg': all_raw_source_reg,
+        // end for tpl parse
+        'is_absolute': _opts['is_absolute'],
+        'static_dir': _opts['runtime_static'],
+        'cdn_prefix': _opts['cdn_prefix'],
+        'url_prefix': _opts['url_prefix'],
+        'components': _opts['components']
     }))
     // 输出到tmp目录，是为了browserify文件时，源文件时干净的，避免被打包过的又打包一次
     .pipe(gulp.dest(_opts['runtime_static_tmp']))
@@ -1380,21 +1311,6 @@ gulp.task('gm:jsmin', ()=>{
 gulp.task('gm:rev-js', ()=>{
     return gulp.src(dist_js_source)
         .pipe(setRevReplace())
-        .pipe(assetsPathParser.absolutizePath({
-            // replace relative path to absolute path
-            'cwd': _cwd,
-            // add for tpl parse
-            '_opts': _opts,
-            // related to final url
-            '_isRuntimeDir': false,
-            'all_raw_source_reg': all_raw_source_reg,
-            // end for tpl parse
-            'is_absolute': _opts['is_absolute'],
-            'static_dir': _opts['runtime_static'],
-            'cdn_prefix': _opts['cdn_prefix'],
-            'url_prefix': _opts['url_prefix'],
-            'components': _opts['components']
-        }))
         .pipe(gulp.dest(_opts['dist_static']))
 })
 
