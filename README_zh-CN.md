@@ -9,31 +9,32 @@
 
 # gulpman
 
-[简体中文文档](https://github.com/xunuoi/gulpman/blob/master/README_zh-CN.md)
+[English Document](https://github.com/xunuoi/gulpman/blob/master/README.md)
 
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable than `FIS`. Everyone know gulp can do secondary development.
-- Support `base64` image in `html/CSS`
-- Support `JS/CSS` inlnied in html
-- Intergrated with `spritesmith`, support auto sprite img
-- Intergrated with `icon-font`, support SVG 2 Iconfont.
-- Intergrated with `usemin`，support complex combo/package.
-- Supoort FE Tpl embed function， the `.tpl` file will packaged into js file，support async js loading.
-- Intergrated with `SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein` and other plugins，One-Stop Solution Service， very Simple and Strong
-- High scalability, compatiable with almost `gulp` plugins, you can use them in `gulpman`. For example, you can put `browser-sync` in your gulpman build system
-- Intergrated with `karma` framework，support `babel/es6` unit test and coverage result.
+- 基于`gulp`的前端组件化、模块化解决方案，比百度`FIS`更简单、灵活、可控性高，会gulp就会定制自己的方案
+- 支持图片`base64`方式嵌入到`html/CSS`
+- 支持`JS/CSS`内联方式嵌入html文件
+- 整合`spritesmith`，简单生成sprite雪碧图
+- 整合`icon-font`转换，支持svg转换
+- 整合`usemin`，构建合并更加灵活强大
+- 支持前端js模板嵌入，`tpl`格式的直接构建打包到最终js文件，支持异步加载js
+- 集成`SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein`等常用组件，做到一站式自动化解决方案，同时清晰、可控，定制、修改简单
+- 扩展性高，`gulp`现有的插件都可以拼装、加入到`gulpman`中使用，你可以自己根据实际情况组合、修改，比如可以轻松整合`browser-sync`到构建系统中。
+- 整合`karma`单元测试框架，适配`babel和es6`的代码单元测试和`coverage`
 
 
-##Introduction
-- Support Mac、Linux
-- No full test under Windows. You can install `gulp`、`gulp-sass` manually
-- Node need higher than 4.0.0
-- *For npm 3, after run `npm install`，maybe need install `gulp-sass``babel-preset-es2015` `babel-preset-react`
+
+##说明
+- 支持Mac、Linux环境下安装、使用
+- Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
+- 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
+- Node版本需要不低于4.0.0
+- *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react`等几个依赖
 
 
-##Install
+##安装
 - `npm install gulpman --save-dev`
-
 
 #### 注：
 * 安装中若npm报出目录权限导致的error，比如涉及到`/usr/local/lib/node_modules`权限的报错，请请检查其权限是否正常并用chown来修复，将拥有者修改为当前登录用户即可。
@@ -45,7 +46,7 @@
 
 
 
-##Config 配置
+##配置
 
 ###0. 支持自动默认模式，无需配置即使用
 
