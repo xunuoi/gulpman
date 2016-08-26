@@ -35,27 +35,25 @@
 - `npm install gulpman --save-dev`
 
 
-#### 注：
-* 安装中若npm报出目录权限导致的error，比如涉及到`/usr/local/lib/node_modules`权限的报错，请请检查其权限是否正常并用chown来修复，将拥有者修改为当前登录用户即可。
-* 可以使用 `sudo chown -R "$(whoami)"`+`路径`来修复
-* 不要使用`sudo npm install`来手工安装因为权限问题而失败的模块。请修改权限后，再用`npm install`来安装即可
-* 如果你本地node和npm的安装和权限正常，那gulpman的安装过程应该都是顺利和成功的。
-* 图片压缩模块imagemin-pngquant需要依赖`libpng-devel`，如果是Linux环境，建议先运行`yum install libpng-devel`来确保安装
-* 安装过程中无故退出，请查看`npm-debug.log`，检查是否是内存不足`ENOMEM`导致。
+#### Note
+* If error happened in npm install，such as `/usr/local/lib/node_modules` permission error, fix this by `sudo chown -R "$(whoami)"`+`Path`
+* `sudo npm install` is not recommended
+* The imagemin-pngquant module need`libpng-devel`，if in Linux, please run `yum install libpng-devel` at first
+* If install failed, check the `npm-debug.log`，is there are some `ENOMEM`error
 
 
 
-##Config 配置
+##Config
 
-###0. 支持自动默认模式，无需配置即使用
+###0. Support Auto Mode, no Config
 
-* 可直接跳过`Config 配置`处的说明，直接去看后面的`Usage 使用`内容
+* You can skip `Config`, and directly jump to `Usage`
 
 
-###1. 配置 gulpfile.js:
+###1. Config gulpfile.js:
 
-- 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
-- 使用时在命令行中直接输入`gulp gm:publish`即可执行gulpman预置的任务
+- require the `gulpman` in your gulpfile.js，then it will load `gm:publish`, `gm:develop` into gulp tasks.
+- `gulp gm:publish` or `gulp gm:develop` in terminal then it will work
 
 
 ```Javascript
@@ -72,64 +70,59 @@ var gulp = require('gulp'),
 
 
 /**
- * 配置gulpman ======================
+ * config gulpman ======================
  * Use config API
- * 设置路径、CDN、资源URL前缀等，API简单
+ * assets path, CDN, URL prefix
  */
 
 gman.config({
     
-    // 是否使用绝对路径，默认值true, 推荐使用，方便服务器配置。比如`/static/home/main.js`这种风格。
-    // 如果无服务端情况下，本地调试，可以设置is_absolute为false, 那么会是类似`../../assets/static/home/main.js`这种风格
+    // whether use absolute path, default `true` 
     'is_absolute': true,
 
-    // cdn prefix 配置CDN， 支持［字符串|数组|函数］ 3中传参方式
+    // cdn prefix support［string|array|function］arguments
     'cdn_prefix': '', 
 
-    // 配置资源URL前缀，建议类似 /static这种
-    // usually set as /static, this involves the server config ,such as the static path of nginx
+    // url prefix, defautl `/static`. This involves the server config ,such as the static path of nginx
     'url_prefix': '/static' 
 
 
     /** use spritesmith for css-img sprite
-     * 基于spritesmith实现, 详细参见https://github.com/Ensighten/spritesmith
-     * 传递自动生成雪碧图的spritesmit的options
+     * Based on Spritesmith: https://github.com/Ensighten/spritesmith
+     * Automatecially generate Sprite Image & CSS
      **/
-    //'spritesmith': { },保持默认即可
+    //'spritesmith': { },
     
-    /** usemin config 配置usemin,保持默认即可 **/
+    /** usemin config **/
     // 'usemin': {}
 
 
-    // 模块COMPONENTS目录，同一个模块的html和资源文件在一起。默认 'components'即可
+    // The COMPONENTS directory
     'components': 'components',
 
-    // develop和publish下的views目录，跟服务端框架的views目录配置一致，比如express
+    // For development assets and templates folder, related to Server Config
     'runtime_views': 'views',
     'dist_views': 'views_dist',
 
-    // develop和publish下的assets静态目录，跟服务器配置有关，比如nginx的static目录指向，请保持与服务器设定一致。支持多级路径设定，比如assets/public
+    // For production assets and templates folder, related to Server Config
     'runtime_assets': 'assets',
     'dist_assets': 'assets_dist',
 
-    // 第三方JS类库、模块的目录，推荐设置为`lib`或`bower_components`（这样bower可以直接安装到这个目录）
-    // 这个目录默认打包时为全局模块目录，可以直接`import xxx from 'xxx'`，而不用加相对路径
-    // the js library dir, set as a global module. Also you can set as bower_components
+    // The js library dir, set as a global module. Also you can set as `bower_components`
     'lib': 'lib', 
 
-    // 可以添加一个自定的全局模块目录，该目录下的js模块，也作为全局模块来require，不需要相对路径。
-    // the global module dir
+    // You can add one customer global directory, so you can require module name directly, like: `require ('xxx')`. The xxx is in this directory
     'global': 'common' 
 })
 
 
 ```
 
-###2. 如何更好的配置CDN
+###2. How to config CDN better
 
-* `cdn_prefix`支持 字符串、数组、函数
-* 如果传入数组，那么按照随机来分配
-* 如果传入函数，函数会获1个参数，`mediaFile`, 就是当前被css或html中引用到的资源文件名，可以根据文件名做cdn分配
+* `cdn_prefix` support String, Array, Function
+* if argument is array, the CDN will be an random value
+* if argument is function，it would input one argument, `mediaFile`
 
 ```Javascript
 
@@ -144,7 +137,7 @@ gman.config({
             'http://s3.com',
             'http://s4.com'
         ]
-        // 你自可以自实现分配策略
+        // You can customized your strategy
         if(hostFile.match(/\.html$/gm)){
             return c_list[0]
         }else {
