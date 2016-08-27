@@ -9,7 +9,7 @@
 
 # gulpman
 
-[简体中文文档](https://github.com/xunuoi/gulpman/blob/master/README_zh-CN.md)
+[浏览简体中文文档](https://github.com/xunuoi/gulpman/blob/master/README_zh-CN.md)
 
 - Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
 - Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable than `FIS`. Everyone know gulp can do secondary development.
@@ -341,7 +341,7 @@ import ReactDOM from 'react-dom';
 
 ###9. Use js tpl template
 * Put the `.tpl` files in your component, and use `require` or `import` in ES6, then the tpl files will be packaged in js files.
-* 最终会作为字符串格式打包进js
+* All tpl will be convertd to text string into js files.
 *  Base64 img and CSS/JS Embed are supported in Tpl
 
 - import tpl in es6
