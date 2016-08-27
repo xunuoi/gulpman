@@ -65,7 +65,7 @@
 var gulp = require('gulp'),
     gman = require('gulpman')
 
-// your other tasks ...你的其他task
+// your other tasks ...
 // xxx ...
 
 
@@ -229,11 +229,11 @@ gulp gm:compile
 ```
 
 
-###2. 开发中只监视某个component目录
+###2. Watch one special component in development
 
-* 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
+* When the project become huge, if we watch all components assets, it will be low efficiency，so we can use gulpman to watch special component to get better performance
 
-* 比如说，只监视components目录下的home模块：
+* Fox example, if we want watch the `home` component:
 
 ```Shell
 
@@ -242,9 +242,9 @@ gulp gm:develop -c home
 ```
 
 
-###3. 如何在gulpman下使用React
-* 安装React: `npm install react react-dom`
-* 在ES6文件中使用
+###3. Use `React` in gulpman
+* Install React: `npm install react react-dom`
+* Use React in ES6:
 
 ```Javascript
 import React from 'react';
@@ -254,18 +254,18 @@ import ReactDOM from 'react-dom';
 ```
 
 
-###4. 如何在js|es6|jsx中使用tpl模板
+###4. Use `tpl` file in js|es6|jsx
 
-* 目前支持.tpl扩展名的模板文件，直接打包到最终的js文件中
+* Support `.tpl` file, it will be packaged in dist js files.
 
-* 用法：`import dialogTpl from './dialog.tpl'` 或者 `var dialogTpl = require('./dialog.tpl')`
+* Usage: `import dialogTpl from './dialog.tpl'` or `var dialogTpl = require('./dialog.tpl')`
 
 
 
-###5. 如何在HTML/CSS中嵌入base64编码的图片
+###5. Usge base64 img in HTML/CSS
 
-* 只需要图片资源后面添加`?_gm_inline`即可
-* 打包时候会将图片生成`base64`编码替换到到html中
+* Just add `?_gm_inline` in assets src path in html/css
+* The `base64` code will be inlined in html/css
 
 
 #####html
@@ -285,9 +285,10 @@ import ReactDOM from 'react-dom';
 }
 ```
 
-###6. 如何在HTML中嵌入内联CSS/JS
 
-* 类似图片base64,只需要资源后面添加`?_gm_inline`即可
+###6. Use inlined CSS/JS in html by querystring
+
+* Like base64, just add `?_gm_inline` in url path
 
 ```html
 <script src="./plugin.js?_gm_inline" type="text/javascript"></script>
@@ -295,14 +296,14 @@ import ReactDOM from 'react-dom';
 <link href="./dialog.css?_gm_inline" rel="stylesheet" type="text/css" >
 ```
 
-* 注：所有内嵌嵌入的资源，包括图片/JS/CSS，在develop(监视)模式下，都已自动关联更新。即如果a.html文件中，内联嵌入了一个b.css，如果b.css发生了修改，那么a.html会自动编译更新。
+* The inlined sources will be auto updated when source files changed.
 
 
-###7. 如何使用Sprite雪碧图
+###7. Use Sprite img in css
 
-* 基于spritesmith实现，在gulpman.config 中可传入spritesmith配置opts
-* 关于spritesmith详细参见：[https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
-* 只需要在scss文件中的图片url资源后面添加`?_gm_sprite`即可
+* Based on spritesmith, you can transport usemin opts in gulpman.config.
+* More detail about Spritesmith: [https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
+* Usage: In scss file, just add `?_gm_sprite` to img url
 
 ```css
 .demo {
@@ -314,12 +315,14 @@ import ReactDOM from 'react-dom';
 }
 ```
 
-###8. 如何使用Usemin
+###8. Use Usemin
 
-* 整合usemin，在gulpman.config 中可传入usemin的配置opts
-* 关于usemin详细参见：[https://github.com/zont/gulp-usemin](https://github.com/zont/gulp-usemin)
-* 只需要在html文件中添加usemin的build注释即可。支持`js`|`css`|`inlinejs`|`inlinecss`等语法
-* 注意build注释中配置的输出路径写相对路径即可，跟script、link等标签类似，gulpman会自动转换成最终输出路径
+* You can tranport usemin opts in gulpman.config
+* More detail about usemin: [https://github.com/zont/gulp-usemin](https://github.com/zont/gulp-usemin)
+* Uage: just add usemin build comments in html. Support `js`|`css`|`inlinejs`|`inlinecss` syntax
+* Note: Just write relative path in usemin build comment. Then gulpman can calculate absolute path for assets.
+* If you don't write output path, the gulpman will combo one new ouput file name automatically.
+
 
 ```html
 
@@ -336,44 +339,44 @@ import ReactDOM from 'react-dom';
 ```
 
 
-###9. 如何使用前端js模板
-* 支持tpl扩展名，放到components相关目录下即可，js 可以直接require或者import
+###9. Use js tpl template
+* Put the `.tpl` files in your component, and use `require` or `import` in ES6, then the tpl files will be packaged in js files.
 * 最终会作为字符串格式打包进js
-* tpl中仍然支持资源嵌入和图片base64等，如参照前面_gm_inline等语法即可
+*  Base64 img and CSS/JS Embed are supported in Tpl
 
-- import到es6中
+- import tpl in es6
 ```js
     import dialogTpl from './dialog.tpl'
 ```
 
-- 或者使用require语法
+- require
 ```js
     var dialogTpl = require('./dialog.tpl')
 ```
 
-###10. 使用iconfont转换
-* 可以将svg转换成icon-font，用`@font-face`方式引用
-* 初次使用先安装，运行`gulp gm:iconfont:install`
-* 将svg文件放到`components/iconfonts/source`目录下，运行`gulp gm:iconfont`即可
-* 自动生成的icon-font和css文件将会在`iconfonts/gmicon`目录下
+###10. Use iconfont convert svg to fontface
+* Convert SVG to icon-font, use `@font-face` in css
+* Run `gulp gm:iconfont:install` before first running
+* Put the svg files in `components/iconfonts/source` directory, then run `gulp gm:iconfont` to begin start convert
+* The icon-font and css will generated in `iconfonts/gmicon` folder
 
 
-###11. 支持LAB.js来完成异步加载js
-* 引入LAB.js到项目中
-* 使用LAB的api来加载即可，使用相对路径
-* 代码用例: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
+###11. Support LAB.js to load async js
+* Add LAB.js in your project
+* Use LAB API to load js, use `relative path`
+* Example: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
-###12. 如何启用karma单元测试
-* 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
-* 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
-* 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果
-* 指定spec目录、browsers等karma的选项，可以在`karma.conf.js`中设置、定制等
+###12. Use karma to do Unit Test
+* Run `gulp gm:karma:install` before first running, it will install dependencies and generate `karma.conf.js`.
+* In your one component folder, create one folder named `spec`, then put your spec es6 files in the `spec` folder, the file extname must be `.es6`
+* Run `gulp gm:karma:start` in CLI to start Karma Unit Test, you can view the coverage result in `coverage` foloder
+* Set one special spec folder、browsers and other karma options, you can set them in `karma.conf.js`
 
 
 
-###教程
-[浏览教程链接](http://karat.cc/article/56a351c3e48d2d05682aa0ac "karat.cc")
+###Tutorial
+[Tutorial Link](http://karat.cc/article/56a351c3e48d2d05682aa0ac "karat.cc")
 
 ###License
 MIT
