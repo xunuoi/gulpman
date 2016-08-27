@@ -146,42 +146,41 @@ gman.config({
     },
 ```
 
-###3. 对于`is_absolute`的说明
+###3. About `is_absolute`
 
-* `is_absolute`是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
+* `is_absolute` is the dist path of source in html. default true. the dist path is like `/static/home/main.js`
 
-* [常用]当使用服务器配置静态目录的情况下，推荐使用绝对目录。比如配合nginx，指定某个目录为静态资源目录。类似`/static/home/main.js`这种风格。
+* [*]Need consistent config with Server, like nginx, apache
 
-* 如果无服务端情况下，有需要本地调试，推荐设置is_absolute为false, 即启用相对路径。类似`../../assets/static/home/main.js`这种风格。
-
-* 当is_absolute为false(启用相对路径)的情况下，直接打开输出的views目录下的html文件，就可以正常浏览、运行、调试
+* If no local server, you can set is_absolute as false, use relative path. Like `../../assets/static/home/main.js`
 
 
+###4. gulpman directory
 
-###4. gulpman目录说明
+* Use gulpman to arrange your directory as component，The root component dir can be`./components`(default). If you have one component named foo, then `./components/foo`，all related assets such as `html|js|css|fonts|image` should be put in `foo` folder.
 
-* 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
+* This solution for assets can be high efficiency and easy to maintain.
 
-* 通过`gm:develop`命令进入`develop`开发模式后，会自动生成模板`views`目录，和静态资源`assets`目录。
+* `gm:develop` to start `develop` mode, the `views` dir and `assets` dir can be generated automatically
 
-* 通过`gm:publish`命令来构建发布资源，会自动生成生产环境下的模板目录`views_dist`，和静态资源目录`assets_dist`。
-
-
-###5. 什么是全局模块目录：
-
-- 对应`Browserify`的打包功能，`全局目录`是指可以直接`require`或者`import`其下的js模块的目录
-
-- `gulpman.config`的配置中，`lib`和`global`都是JS的全局模块目录。举个例子说明：
-* 你的`components/lib`目录下有一个模块 `foo.js`，就是: `components/lib/foo.js`，那么你在你的es6文件中，就可以这样使用：`import foo from 'foo'`，不需要写成 `import foo from '../lib/foo'`
-
-- 同理`global`那个配置也是这样的，推荐将lib目录设置成跟`bower`一致的，全部来存放第三方类库，而`global`设置的目录，比如叫`common`，可以存放自己的`公用模块`。这样开发会更加灵活、方便。
-
-- 注意全局模块不要有同名冲突。
+* `gm:publish` to publish assets in production env. The `views_dist` and `assets_dist` can generated.
 
 
-###6. 支持复杂目录和多级目录设定
+###5. What is global directory
 
-* 比如下面这种复杂路径：
+- For `Browserify` packing, the js module in `global dir` can be directly `require` or `import` in es6/js code
+
+- In `gulpman.config`, the `lib`和`global` are global directory. Take an example:
+* In `components/lib` directory, you have one module `foo.js`，then it is `components/lib/foo.js`. So when you use foo in your es6 file, you can use it like: `import foo from 'foo'`, no need write as `import foo from '../lib/foo'`
+
+- similarly, `global` option can set your dir as global module dir. You can set `bower` dir as your `lib` dir.
+
+- Please make no conficts in your global dir
+
+
+###6. Support for complex and multi level directory in config
+
+* Such as:
 
 ```Javascript
 gulpman.config({
@@ -196,34 +195,34 @@ gulpman.config({
 ```
 
 
-##Usage 使用
+##Usage
 
-###1. CLI 执行Task:
+###1. CLI run Task:
 
 ```Shell
 
-# 初始化目录，建立components目录并添加一份html的demo文件
+# Create components directory and add one demo
 # init components dir and a html demo
 gulp gm:init
 
 
-# develop and watch 开发模式，监视相关文件变动，增量更新
+# develop and watch mode，watchings files changes and update files
 gulp gm:develop
 
-# 指定监视某个component, 提高性能和效率
+# Watch one special component
 gulp gm:develop -c component_name
 
 
-# publish 发布资源，包括合并、压缩资源、rev产生MD5等
+# publish assets in production env
 gulp gm:publish
 
-# publish命令支持`-a`和`-v`参数指定输出资源/模板目录(可选)
+# publish command support `-a`和`-v` parameters to set output assets/views path.
 gulp gm:publish -v your_views_dist -a your_assets_dist
 
-# clean 清理构建输出的目录和文件
+# clean dist files
 gulp gm:clean
 
-# 编译输出一份运行时资源文件，但是不进入监视状态
+# Generate one developing assets/views files, but not in watching mode
 # compile for develop, not watch
 gulp gm:compile
 
