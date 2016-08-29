@@ -268,7 +268,40 @@ function browserified(fpath, sourceDir){
             j(sourceDir, _opts['global'])
         ],
 
-        transform: [ stringify(['.tpl', '.txt']) ]
+        transform: [ 
+            stringify(['.tpl', '.txt']), 
+            ['browserify-css', {
+                global: true,
+                autoInject: true,
+                onFlush: function(options, done) {
+
+                    // @debug 
+                    // here can do a function for calculate path
+                    let fRelativeName = path.relative(_opts['runtime_static_tmp'], options.href)
+                    let tmpSourceFilePath = path.join(_cwd, _opts['components'], fRelativeName)
+
+                    let sourceFilePath = gmutil.convertSource(tmpSourceFilePath, 'css')
+                    
+                    let tmpJSRelativePath = path.relative(_opts['runtime_static_tmp'], fpath)
+                    let jsSoucefilePath = path.join(_opts['components'], tmpJSRelativePath)
+
+                    // @debug the fpath is not real source path, but ignore this path becuase no use now.
+                    store.save(sourceFilePath, jsSoucefilePath, 'requiredCSS')
+
+                    done();
+                }
+                // for path src in css
+                /*processRelativeUrl: function(relativeUrl) {
+                    if (_.contains(['.jpg','.png','.gif'], path.extname(relativeUrl))) {
+                        // Embed image data with data URI
+                        var DataUri = require('datauri');
+                        var dUri = new DataUri(relativeUrl);
+                        return dUri.content;
+                    }
+                    return relativeUrl;
+                }*/
+            }]
+        ]
     }
 
     // use wathcify to browserify
@@ -338,20 +371,29 @@ function getComponentsPath(){
 // get handler for relevancy update
 function getRelevancyHandler() {
     return {
-        // 目前只有raw目录中被引用的的scss实现了增量编译
+        // only the scss files in raw folder implemented increasement updates
         'scss': compile_sass,
         'html': function (rawHtmlFile){
-            // html实现了增量编译base64文件
+            // The html has implemented increaement updates for Base64 
             gmutil.tip('*Relevancy HTML: '+rawHtmlFile)
             let basepath = getComponentsPath()
             parseRawHTML(gulp.src(rawHtmlFile), basepath, true)
+        },
+        'requiredCSS': function(filePath, event) {
+            // here the filePath is related ES6 js file, not scss file
+
+            // the  `event` comes from watcher 
+            fireUpdate('es6', {
+                'type': 'changed',
+                'path': filePath,
+            })
         },
         'sprite': function (filePath, event) { 
             /**
              * if the img is in sprite-relevancy, then fire the scss event to re-compile-css
              */
 
-            // 这个event是从raw资源的watcher的事件中获取的
+            // the  `event` comes from raw files watcher 
             fireUpdate('sprite', {
                 'type': 'changed',
                 'path': filePath,
@@ -553,6 +595,7 @@ gulp.task('gm:compile-css-sprite', ()=>{
     // 现在问题是，spriteCSS还没运行完，下面就执行了，parsseHTML，所以导致html内容是spriteCSS之前的
     
     return es.merge.apply(null, tasks)
+    // here can do optimization , continue use this pipe to do traversal
 })
 
 
@@ -574,6 +617,13 @@ gulp.task('gm:compile-css-traversal', ()=>{
         'cdn_prefix': _opts['cdn_prefix'],
         'url_prefix': _opts['url_prefix'],
         'components': _opts['components']
+    }))
+    .pipe(gulp.dest('./'))
+    // for css require in js
+    .pipe(p.rename(fpath=>{
+        let fRelativeDir = path.relative(_opts['runtime_static'], fpath.dirname)
+        let fTmpStaticDir = path.join(_opts['runtime_static_tmp'], fRelativeDir)
+        fpath.dirname = fTmpStaticDir
     }))
     .pipe(gulp.dest('./'))
     
@@ -620,6 +670,8 @@ gulp.task('gm:compile-media-check', ['gm:compile-css'], function(){
             gmutil.tip('*Target File: '+tarFilePath)
 
             storeCheck(tarFilePath)
+            // check if it is requiredCSS
+            storeCheck(epath, 'requiredCSS', 'requiredCSS', curEvent)
             // @debug 如果不remove，会有重复触发
             removeUpdateEvent()
         }else {
@@ -1000,11 +1052,11 @@ function getAbsPathOfTarget(epath, tarBaseDir){
 
 
 // check file dep 
-function _checkRelevancy(filePth, event){            
+function _checkRelevancy(filePath, event){            
             
     // check for raw sources
-    storeCheck(filePth)
-    storeCheck(filePth, 'sprite', 'sprite', event)
+    storeCheck(filePath)
+    storeCheck(filePath, 'sprite', 'sprite', event)
 }
 
 

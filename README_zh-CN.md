@@ -30,7 +30,7 @@
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
 - Node版本需要不低于4.0.0
-- *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react`等几个依赖
+- *注意目前对于npm 3版本及以上(目前大家基本都是2.x)，运行完`npm install`后，可能需要手动安装`gulp-sass``babel-preset-es2015` `babel-preset-react` ｀browserify-css｀等几个依赖
 
 
 ##安装
@@ -373,7 +373,15 @@ import ReactDOM from 'react-dom';
 * 代码用例: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
-###12. 如何启用karma单元测试
+
+###12. Require CSS in js
+* 直接在js中require你的css文件（源文件时scss文件）
+* The CSS contents will be packaged into js files, and automatically injected to html when page opend. Using style tag
+* 使用时要确保添加 .css 扩展名
+* 举例: `require('./style.css')` or `import style from './style.css'`
+
+
+###13. 如何启用karma单元测试
 * 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
 * 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
 * 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果

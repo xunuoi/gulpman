@@ -33,6 +33,7 @@ echo "\n*Now Install the babel preset \n"
 # install babel preset
 npm install babel-preset-es2015 --save
 npm install babel-preset-react --save
+npm install browserify-css --save
 cd -
 
 

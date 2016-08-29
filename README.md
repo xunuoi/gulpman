@@ -28,7 +28,7 @@
 - Support Mac、Linux
 - No full test under Windows. You can install `gulp`、`gulp-sass` manually
 - Node need higher than 4.0.0
-- *For npm 3, after run `npm install`，maybe need install `gulp-sass``babel-preset-es2015` `babel-preset-react`
+- *For npm 3, after run `npm install`，maybe need install `gulp-sass``babel-preset-es2015` `babel-preset-react` ｀browserify-css｀
 
 
 ##Install
@@ -367,7 +367,14 @@ import ReactDOM from 'react-dom';
 * Example: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
-###12. Use karma to do Unit Test
+###12. Require CSS in JS
+* Require css files in your es6/js files
+* The CSS contents will be packaged into js files, and automatically injected to html when page opend. Using style tag
+* Should keep the .css extname
+* Example: `require('./style.css')` or `import style from './style.css'`
+
+
+###13. Use karma to do Unit Test
 * Run `gulp gm:karma:install` before first running, it will install dependencies and generate `karma.conf.js`.
 * In your one component folder, create one folder named `spec`, then put your spec es6 files in the `spec` folder, the file extname must be `.es6`
 * Run `gulp gm:karma:start` in CLI to start Karma Unit Test, you can view the coverage result in `coverage` foloder
