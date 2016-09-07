@@ -15,6 +15,7 @@
 - Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable than `FIS`. Everyone know gulp can do secondary development.
 - Support `base64` image in `html/CSS`
 - Support `JS/CSS` inlnied in html
+- Support `require('xxx.css')`, require css file in js
 - Intergrated with `spritesmith`, support auto sprite img
 - Intergrated with `icon-font`, support SVG 2 Iconfont.
 - Intergrated with `usemin`，support complex combo/package.
