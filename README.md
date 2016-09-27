@@ -15,7 +15,7 @@
 - Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable than `FIS`. Everyone know gulp can do secondary development.
 - Support `base64` image in `html/CSS`
 - Support `JS/CSS` inlnied in html
-- Support `require('xxx.css')`, require css file in js
+- Support `require('main.css')`, require css file in js
 - Intergrated with `spritesmith`, support auto sprite img
 - Intergrated with `icon-font`, support SVG 2 Iconfont.
 - Intergrated with `usemin`，support complex combo/package.
@@ -29,7 +29,7 @@
 - Support Mac、Linux
 - No full test under Windows. You can install `gulp`、`gulp-sass` manually
 - Node need higher than 4.0.0
-- *For npm 3, after run `npm install`, maybe need install `gulp-sass`, `babel-preset-es2015`, `babel-preset-react`, `browserify-css`
+- *For npm >= 3, after run `npm install`, please manually install `gulp-sass`, `babel-preset-es2015`, `babel-preset-react`, `browserify-css`
 
 
 ##Install
