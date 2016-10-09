@@ -40,7 +40,7 @@
 * If error happened in npm install，such as `/usr/local/lib/node_modules` permission error, fix this by `sudo chown -R "$(whoami)"`+`Path`
 * `sudo npm install` is not recommended
 * The imagemin-pngquant module need`libpng-devel`，if in Linux, please run `yum install libpng-devel` at first
-* If install failed, check the `npm-debug.log`，is there are some `ENOMEM`error
+* If install failed, check the `npm-debug.log` to see if there are some `ENOMEM`errors
 
 
 
