@@ -28,7 +28,7 @@
 ##Introduction
 - Support Mac、Linux
 - No full test under Windows. You can install `gulp`、`gulp-sass` manually
-- Node need higher than 4.0.0
+- Required Node >= 4.0.0
 - *For npm >= 3, after run `npm install`, please manually install `gulp-sass`, `babel-preset-es2015`, `babel-preset-react`, `browserify-css`
 
 
