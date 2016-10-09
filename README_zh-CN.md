@@ -11,8 +11,8 @@
 
 [English Document](https://github.com/xunuoi/gulpman/blob/master/README.md)
 
-- Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- 基于`gulp`的前端组件化、模块化解决方案，比百度`FIS`更简单、灵活、可控性高，会gulp就会定制自己的方案
+- 支持资源模块化组织方式，通过相对路径运算，像百度的FIS一样，可以将JS/css/img/fonts/tpl 按照功能单位组织到同一个目录中，不再分散维护。Gulpman运行时会自动分发各种资源到正确目录。
+- 基于`gulp`的前端组件化、模块化解决方案，更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 支持图片`base64`方式嵌入到`html/CSS`
 - 支持`JS/CSS`内联方式嵌入html文件
 - 整合`spritesmith`，简单生成sprite雪碧图
