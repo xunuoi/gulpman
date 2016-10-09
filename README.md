@@ -11,8 +11,8 @@
 
 [浏览简体中文文档](https://github.com/xunuoi/gulpman/blob/master/README_zh-CN.md)
 
-- Create Modular Front-End Build System, based on gulp , more light and easier than FIS!
-- Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable than `FIS`. Everyone know gulp can do secondary development.
+- Create Modular Front-End Build System, organize the source by module, js/css/img/fonts/tpl are located in one same folder, like Baidu `FIS`. Good concept for FE source management / development.
+- Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable. Everyone know gulp can do secondary development.
 - Support `base64` image in `html/CSS`
 - Support `JS/CSS` inlnied in html
 - Support `require('main.css')`, require css file in js
