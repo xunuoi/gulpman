@@ -12,6 +12,7 @@
 [English Document](https://github.com/xunuoi/gulpman/blob/master/README.md)
 
 - 支持资源模块化组织方式，通过相对路径运算，像百度的FIS一样，可以将`js/css/img/fonts/tpl`按照功能单位组织到同一个目录中，不再分散维护。Gulpman运行时会自动分发各种资源到正确目录。
+- 概念介绍: [前端工程之模块化](http://fex.baidu.com/blog/2014/03/fis-module/)
 - 基于`gulp`的前端组件化、模块化解决方案，更简单、灵活、可控性高，会gulp就会定制自己的方案
 - 支持图片`base64`方式嵌入到`html/CSS`
 - 支持`JS/CSS`内联方式嵌入html文件
