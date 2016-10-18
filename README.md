@@ -12,6 +12,7 @@
 [浏览简体中文文档](https://github.com/xunuoi/gulpman/blob/master/README_zh-CN.md)
 
 - Create Modular Front-End Build System, organize the source by module, using relative path, `html/js/css/img/fonts/tpl` are in one same folder, like Baidu `FIS`. Good concept for FE source management / development.
+- Concept Introduction: [前端工程之模块化](http://fex.baidu.com/blog/2014/03/fis-module/)
 - Component Oriented Solution, based on `gulp`. More simple, flexible, expandable and stable. Everyone know gulp can do secondary development.
 - Support `base64` image in `html/CSS`
 - Support `JS/CSS` inlnied in html
