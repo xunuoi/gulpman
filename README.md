@@ -21,7 +21,7 @@
 - Intergrated with `icon-font`, support SVG 2 Iconfont.
 - Intergrated with `usemin`，support complex combo/package.
 - Supoort FE Tpl embed function， the `.tpl` file will packaged into js file，support async js loading.
-- Intergrated with `SCSS|ES6|ReactJS|Babel|Browserify|cssnano|uglify|imagmein` and other plugins，One-Stop Solution Service， very Simple and Strong
+- Intergrated with `SCSS|ES6|ReactJS|Vuejs|Babel|Browserify|cssnano|uglify|imagmein` and other plugins，One-Stop Solution Service， very Simple and Strong
 - High scalability, compatiable with almost `gulp` plugins, you can use them in `gulpman`. For example, you can put `browser-sync` in your gulpman build system
 - Intergrated with `karma` framework，support `babel/es6` unit test and coverage result.
 
