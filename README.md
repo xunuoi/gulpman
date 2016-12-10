@@ -379,7 +379,7 @@ import ReactDOM from 'react-dom';
 * Example: `require('./style.css')` or `import style from './style.css'`
 
 
-###13. Use karma to do Unit Test
+###13. Use karma for Unit Test
 * Run `gulp gm:karma:install` before first running, it will install dependencies and generate `karma.conf.js`.
 * In your one component folder, create one folder named `spec`, then put your spec es6 files in the `spec` folder, the file extname must be `.es6`
 * Run `gulp gm:karma:start` in CLI to start Karma Unit Test, you can view the coverage result in `coverage` foloder
