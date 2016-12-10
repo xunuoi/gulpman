@@ -1,7 +1,7 @@
 {
   "name": "Project",
   "version": "1.0.0",
-  "description": "Gulpman Project, update this description",
+  "description": "Project build by Gulpman, update this description",
   "engines": {
     "node": ">=4.2.0"
   },
@@ -9,11 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gulpman/proj.git"
+    "url": "git+https://github.com/your-project"
   },
   "keywords": [
     "gulpman",
-    "karat.cc"
+    "components",
+    "browserify",
+    "es6",
+    "jsx"
   ],
   "author": "Gulpman",
   "license": "MIT",

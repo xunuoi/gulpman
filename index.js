@@ -505,7 +505,7 @@ gulp.task('gm:clean', ()=>{
 })
 
 // clean dir includes components
-gulp.task('gm:clean-full', ['gm:clean'],()=>{
+gulp.task('gm:clean-deep', ['gm:clean'],()=>{
     var pSep = '/' //path.sep
 
     var runtime_assetsRoot = path.normalize(_opts['runtime_assets']).split(pSep)[0]

@@ -232,6 +232,9 @@ gulp gm:publish -v your_views_dist -a your_assets_dist
 # clean 清理构建输出的目录和文件
 gulp gm:clean
 
+# clean 清理构建输出的目录和文件，包括自文件夹/目录
+gulp gm:clean-deep
+
 # 编译输出一份运行时资源文件，但是不进入监视状态
 # compile for develop, not watch
 gulp gm:compile

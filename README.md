@@ -224,6 +224,9 @@ gulp gm:publish -v your_views_dist -a your_assets_dist
 # clean dist files
 gulp gm:clean
 
+# clean dist files, including subfolders
+gulp gm:clean-deep
+
 # Generate one developing assets/views files, but not in watching mode
 # compile for develop, not watch
 gulp gm:compile

@@ -5,7 +5,12 @@
 
 
 # init the package.json is not existed
-cp ./scripts/package.json ../../
+packageFile="../../package.json"
+
+if [ ! -f "$packageFile" ]; then
+    cp ./scripts/package.json ../../
+fi
+
 
 
 echo "\n\n*Check whether the gulp is installed in global:"
