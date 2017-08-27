@@ -86,7 +86,7 @@ gman.config({
     'cdn_prefix': '', 
 
     // url prefix, defautl `/static`. This involves the server config ,such as the static path of nginx
-    'url_prefix': '/static' 
+    'url_prefix': '/static',
 
 
     /** use spritesmith for css-img sprite
