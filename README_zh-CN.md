@@ -86,11 +86,11 @@ gman.config({
     'is_absolute': true,
 
     // cdn prefix 配置CDN， 支持［字符串|数组|函数］ 3中传参方式
-    'cdn_prefix': '', 
+    'cdn_prefix': '',
 
     // 配置资源URL前缀，建议类似 /static这种
     // usually set as /static, this involves the server config ,such as the static path of nginx
-    'url_prefix': '/static' 
+    'url_prefix': '/static',
 
 
     /** use spritesmith for css-img sprite
