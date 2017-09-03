@@ -2,6 +2,7 @@
 
 # init the package.json if not existed
 packageFile="../../package.json"
+Install_Type=1
 
 if [ ! -f "$packageFile" ]; then
     cp ./scripts/package.json ../../
