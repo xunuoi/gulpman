@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/xunuoi/gulpman#readme",
   "devDependencies": {
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.0"
   },
   "dependencies": {
     "gulp-babel": "^6.1.2",
