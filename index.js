@@ -65,7 +65,7 @@ let _opts = {
 
     // define babel optionals
     'babel': {
-        'presets': ['es2015', 'react'],
+        'presets': ['es2015', 'react', 'stage-3'],
         'sourceMaps': 'inline'
     },
 
@@ -1594,7 +1594,7 @@ gulp.task('gm:init', p.sequence(
 
 // init the proj
 gulp.task('gm:install', () => {
-    sh.exec('npm install babel-preset-es2015 babel-preset-react browserify-css --save-dev')
+    sh.exec('npm install babel-preset-es2015 babel-preset-react babel-preset-stage-3 browserify-css --save-dev')
 })
 
 
@@ -1603,7 +1603,7 @@ gulp.task('gm:install', () => {
  */
 
 gulp.task('gm:karma:install', ()=>{
-    sh.exec('npm install karma karma-browserify karma-coverage karma-jasmine karma-chrome-launcher browserify-istanbul babel-preset-es2015 babel-preset-react babelify babel-istanbul watchify stringify --save-dev')
+    sh.exec('npm install karma karma-browserify karma-coverage karma-jasmine karma-chrome-launcher browserify-istanbul babel-preset-es2015 babel-preset-react babel-preset-stage-3 babelify babel-istanbul watchify stringify --save-dev')
 
     sh.cp('./node_modules/gulpman/karma/karma.conf.js', './')
 })
