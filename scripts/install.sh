@@ -4,7 +4,7 @@
 # @mail: xwlxyjk@gmail.com
 
 
-# init the package.json is not existed
+# init the package.json if not existed
 packageFile="../../package.json"
 
 if [ ! -f "$packageFile" ]; then
@@ -40,78 +40,6 @@ npm install babel-preset-es2015 --save
 npm install babel-preset-react --save
 npm install browserify-css --save
 cd -
-
-
-
-# check if the user want use cnpm. Chinese Mainland Recommend
-
-while :  # loop
-do
-if read -t 5 -n 1 -p "*Do you want install cnpm ?(Mainland China Recommend) [Y/N]:"  #limited time 5s  
-    then
-        case $REPLY in
-            Y|y) #Y
-                Install_Type=1;
-                echo "\n*Install cnpm [default]"
-                break
-                ;;
-            N|n) #N
-                Install_Type=0;
-                echo "\n*Not install cnpm"
-                break
-                ;;
-            *) #input error repeat
-                echo "\n**Please input right params ! [Y] or [N] \n"
-              continue
-        esac 
-else #timeover
-
-    Install_Type=1;
-    echo "\n*Install cnpm [default]"
-    break
-fi 
-done
-
-# echo 'Type: ' $Install_Type
-
-# check if need install cnpm and do it
-if [ $Install_Type -eq 1 ];then
-    # for cnpm
-    echo "\n\n*Check whether the cnpm is installed:"
-
-    cnpm >/dev/null 2>&1
-
-    if [ $? -eq 0 ];then
-        echo "\n*cnpm has been installed"
-    else
-        echo "\n*cnpm not installed, now install cnpm -g"
-        npm install -g cnpm --registry=https://registry.npm.taobao.org
-    fi
-
-fi
-
-
-
-# for gulp-sass
-echo "\n*Now install gulp-sass by cnpm:"
-
-if [ $Install_Type -eq 1 ];then
-
-    echo "\n*Install gulp-sass by {cnpm} [default]"
-    cnpm install gulp-sass --save-dev
-else
-    echo "\n*Install gulp-sass by {npm}"
-    npm install gulp-sass --save-dev
-fi
-
-# check whether the gulp-sass install succeed
-if [ $? -eq 0 ];then
-    echo "'\n\n*Install gulp-sass Completed!"
-else
-    echo "\n\n*Install gulp-sass Failed! \n*You need install gulp-sass manually!"
-fi
-
-
 
 # copy gulpfile.js if not exist
 script_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )

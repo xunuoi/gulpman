@@ -1,13 +1,12 @@
 {
   "name": "gulpman",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.0.0"
   },
   "main": "index.js",
   "scripts": {
-    "postinstall": "sh ./scripts/install.sh",
     "test": "make test"
   },
   "repository": {
@@ -35,13 +34,13 @@
   "homepage": "https://github.com/xunuoi/gulpman#readme",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-sass": "^2.0.4"
   },
   "dependencies": {
     "gulp-babel": "^6.1.2",
     "browserify": "^13.1.0",
     "stringify": "^5.1.0",
     "colors": "^1.1.2",
+    "gulp-sass": "^4.5.3",
     "event-stream": "^3.3.2",
     "globby": "^6.0.0",
     "gulp-cssnano": "^2.1.2",

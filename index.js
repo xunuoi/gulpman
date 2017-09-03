@@ -1592,6 +1592,11 @@ gulp.task('gm:init', p.sequence(
     'gm:open-demo'
 ))
 
+// init the proj
+gulp.task('gm:install', () => {
+    sh.exec('npm install babel-preset-es2015 babel-preset-react browserify-css --save-dev')
+})
+
 
 /**
  * FOR karma ut test and coverage =====

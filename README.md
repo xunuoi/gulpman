@@ -36,6 +36,8 @@
 ##Install
 - `npm install gulpman --save-dev`
 
+- After finished, run `gulp gm:install`
+
 
 #### Note
 * If error happened in npm install，such as `/usr/local/lib/node_modules` permission error, fix this by `sudo chown -R "$(whoami)"`+`Path`

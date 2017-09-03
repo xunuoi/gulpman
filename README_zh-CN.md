@@ -36,6 +36,7 @@
 
 ##安装
 - `npm install gulpman --save-dev`
+- 完成后运行 `gulp gm:install`
 
 #### 注：
 * 安装中若npm报出目录权限导致的error，比如涉及到`/usr/local/lib/node_modules`权限的报错，请请检查其权限是否正常并用chown来修复，将拥有者修改为当前登录用户即可。
