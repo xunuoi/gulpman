@@ -40,6 +40,8 @@
 - 完成后运行 `gulp gm:install`
 
 #### 注：
+* 如果安装过程中提示 `gulp-sass` 安装失败, 运行 `cnpm install gulp-sass gulp-imagemin` 来修复。
+
 * 安装中若npm报出目录权限导致的error，比如涉及到`/usr/local/lib/node_modules`权限的报错，请请检查其权限是否正常并用chown来修复，将拥有者修改为当前登录用户即可。
 * 可以使用 `sudo chown -R "$(whoami)"`+`路径`来修复
 * 不要使用`sudo npm install`来手工安装因为权限问题而失败的模块。请修改权限后，再用`npm install`来安装即可
