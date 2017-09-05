@@ -40,10 +40,10 @@ echo "\n*Now install gulp-sass by cnpm:"
 if [ $Install_Type -eq 1 ];then       
       
     echo "\n*Install gulp-sass by {cnpm} [default]"       
-    cnpm install gulp-sass --save-dev     
+    cnpm install gulp-sass@3.1.0 --save-dev     
 else      
     echo "\n*Install gulp-sass by {npm}"      
-    npm install gulp-sass --save-dev      
+    npm install gulp-sass@3.1.0 --save-dev      
 fi        
       
 # check whether the gulp-sass install succeed     
