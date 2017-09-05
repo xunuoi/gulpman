@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.9.8",
+  "version": "1.9.9",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.0.0"
@@ -48,6 +48,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev-all": "^0.8.24",
+    "gulp-sass": "^3.1.0",
     "gulp-sequence": "^0.4.4",
     "gulp-uglify": "^2.0.0",
     "gulp-sourcemaps": "^1.6.0",

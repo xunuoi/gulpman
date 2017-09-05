@@ -36,6 +36,7 @@
 
 ##安装
 - `npm install gulpman --save-dev`
+- 如果在中国，请使用cnpm安装：`cnpm install gulpman --save-dev`
 - 完成后运行 `gulp gm:install`
 
 #### 注：
