@@ -1352,9 +1352,10 @@ gulp.task('gm:jsmin', ()=>{
     return gulp.src([js_source, except_lib_source])
     .pipe(p.uglify())
     .on('error', function (err){ 
-        gmutil.error('*Warning \n*Uglify Error: \n', err.message)
-        gmutil.warn('*Passed ...')
-        return this
+        gmutil.error('*Warning \n*Jsmin Error: \n')
+        console.log(err);
+        gmutil.warn('*Failed ...')
+        this.end();
     })
     .pipe(gulp.dest(_opts['dist_static']))
 })
