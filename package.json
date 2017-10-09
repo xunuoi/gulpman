@@ -1,6 +1,6 @@
 {
   "name": "gulpman",
-  "version": "1.9.93",
+  "version": "1.9.95",
   "description": "Create Modular Front-End Build System. Based on gulp, very easy and light",
   "engines": {
     "node": ">=4.0.0"

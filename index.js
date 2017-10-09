@@ -1595,7 +1595,8 @@ gulp.task('gm:init', p.sequence(
 
 // init the proj
 gulp.task('gm:install', () => {
-    sh.exec('npm install babel-preset-es2015 babel-preset-react babel-preset-stage-3 browserify-css --save-dev')
+    sh.exec('cd node_modules/gulpman && npm install gulp-sass --save');
+    sh.exec('npm install babel-preset-es2015 babel-preset-react babel-preset-stage-3 browserify-css --save-dev');
 })
 
 
