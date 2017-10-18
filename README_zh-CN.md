@@ -367,28 +367,39 @@ import ReactDOM from 'react-dom';
     var dialogTpl = require('./dialog.tpl')
 ```
 
-### 10. 使用iconfont转换
+### 10. 引入css文件到js/html
+- 直接import即可，gulpman会自动加载到html页面中.
+```js
+import from './style.css';
+```
+
+```js
+require('./style.css');
+```
+
+
+### 11. 使用iconfont转换
 * 可以将svg转换成icon-font，用`@font-face`方式引用
 * 初次使用先安装，运行`gulp gm:iconfont:install`
 * 将svg文件放到`components/iconfonts/source`目录下，运行`gulp gm:iconfont`即可
 * 自动生成的icon-font和css文件将会在`iconfonts/gmicon`目录下
 
 
-### 11. 支持LAB.js来完成异步加载js
+### 12. 支持LAB.js来完成异步加载js
 * 引入LAB.js到项目中
 * 使用LAB的api来加载即可，使用相对路径
 * 代码用例: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
 
-### 12. Require CSS in js
+### 13. Require CSS in js
 * 直接在js中require你的css文件（源文件时scss文件）
 * The CSS contents will be packaged into js files, and automatically injected to html when page opend. Using style tag
 * 使用时要确保添加 .css 扩展名
 * 举例: `require('./style.css')` or `import style from './style.css'`
 
 
-### 13. 如何启用karma单元测试
+### 14. 如何启用karma单元测试
 * 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
 * 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
 * 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果

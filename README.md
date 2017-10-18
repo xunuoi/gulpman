@@ -363,27 +363,37 @@ import ReactDOM from 'react-dom';
     var dialogTpl = require('./dialog.tpl')
 ```
 
-### 10. Use iconfont convert svg to fontface
+### 10. import css files into js/html
+- Just import the css, then the gulpman will attach it on page automatically.
+```js
+import from './style.css';
+```
+
+```js
+require('./style.css');
+```
+
+### 11. Use iconfont convert svg to fontface
 * Convert SVG to icon-font, use `@font-face` in css
 * Run `gulp gm:iconfont:install` before first running
 * Put the svg files in `components/iconfonts/source` directory, then run `gulp gm:iconfont` to begin start convert
 * The icon-font and css will generated in `iconfonts/gmicon` folder
 
 
-### 11. Support LAB.js to load async js
+### 12. Support LAB.js to load async js
 * Add LAB.js in your project
 * Use LAB API to load js, use `relative path`
 * Example: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
-### 12. Require CSS in JS
+### 13. Require CSS in JS
 * Require css files in your es6/js files
 * The CSS contents will be packaged into js files, and automatically injected to html when page opend. Using style tag
 * Should keep the .css extname
 * Example: `require('./style.css')` or `import style from './style.css'`
 
 
-### 13. Use karma for Unit Test
+### 14. Use karma for Unit Test
 * Run `gulp gm:karma:install` before first running, it will install dependencies and generate `karma.conf.js`.
 * In your one component folder, create one folder named `spec`, then put your spec es6 files in the `spec` folder, the file extname must be `.es6`
 * Run `gulp gm:karma:start` in CLI to start Karma Unit Test, you can view the coverage result in `coverage` foloder
