@@ -26,14 +26,14 @@
 
 
 
-##说明
+## 说明
 - 支持Mac、Linux环境下安装、使用
 - Windows环境未做完整安装测试，由于安装脚本使用到shell，windows不支持shell，执行完`npm install gulpman --save-dev`后，可能需要手动安装`gulp`、`gulp-sass`模块
 - 如果手动安装`gulp-sass`,建议使用淘宝的`cnpm`来完成，避免国内网络导致`npm`安装失败
 - Node版本需要不低于4.0.0
 
 
-##安装
+## 安装
 - `npm install gulpman --save-dev`
 - 如果在中国，请使用cnpm安装：`cnpm install gulpman --save-dev`
 - 完成后请运行 `gulp gm:install` 来完成安装
@@ -50,14 +50,14 @@
 
 
 
-##配置
+## 配置
 
-###0. 支持自动默认模式，无需配置即使用
-
+### 0. 支持自动默认模式，无需配置即使用
+ 
 * 可直接跳过`Config 配置`处的说明，直接去看后面的`Usage 使用`内容
 
 
-###1. 配置 gulpfile.js:
+### 1. 配置 gulpfile.js:
 
 - 只需要require gulpman模块，就会自动加载`gm:publish`, `gm:develop`（开发监视模式）等task到环境中
 - 使用时在命令行中直接输入`gulp gm:publish`即可执行gulpman预置的任务
@@ -130,7 +130,7 @@ gman.config({
 
 ```
 
-###2. 如何更好的配置CDN
+### 2. 如何更好的配置CDN
 
 * `cdn_prefix`支持 字符串、数组、函数
 * 如果传入数组，那么按照随机来分配
@@ -158,7 +158,7 @@ gman.config({
     },
 ```
 
-###3. 对于`is_absolute`的说明
+### 3. 对于`is_absolute`的说明
 
 * `is_absolute`是指输出的html文件中的资源src/url，否使用绝对路径，默认值true，即启用绝对目录。 
 
@@ -170,7 +170,7 @@ gman.config({
 
 
 
-###4. gulpman目录说明
+### 4. gulpman目录说明
 
 * 使用gulpman按照模块划分后，模块根目录可以是`./components`(默认，可配置)，如果你有个模块是foo，那么应该有如下目录：`./components/foo`，然后跟foo模块相关的`html|js|css|fonts|image`等资源文件都放到`foo`下，这个结构下，做开发时非常清晰、高效，便于模块组织、资源定位等。
 
@@ -179,7 +179,7 @@ gman.config({
 * 通过`gm:publish`命令来构建发布资源，会自动生成生产环境下的模板目录`views_dist`，和静态资源目录`assets_dist`。
 
 
-###5. 什么是全局模块目录：
+### 5. 什么是全局模块目录：
 
 - 对应`Browserify`的打包功能，`全局目录`是指可以直接`require`或者`import`其下的js模块的目录
 
@@ -191,7 +191,7 @@ gman.config({
 - 注意全局模块不要有同名冲突。
 
 
-###6. 支持复杂目录和多级目录设定
+### 6. 支持复杂目录和多级目录设定
 
 * 比如下面这种复杂路径：
 
@@ -208,9 +208,9 @@ gulpman.config({
 ```
 
 
-##Usage 使用
+## Usage 使用
 
-###1. CLI 执行Task:
+### 1. CLI 执行Task:
 
 ```Shell
 
@@ -245,7 +245,7 @@ gulp gm:compile
 ```
 
 
-###2. 开发中只监视某个component目录
+### 2. 开发中只监视某个component目录
 
 * 随着项目变大，开发中如果全局监视所有component资源，效率将会降低，因此可使用gulpman提供的监视子component的方式来开发，提高性能
 
@@ -258,7 +258,7 @@ gulp gm:develop -c home
 ```
 
 
-###3. 如何在gulpman下使用React
+### 3. 如何在gulpman下使用React
 * 安装React: `npm install react react-dom`
 * 在ES6文件中使用
 
@@ -270,7 +270,7 @@ import ReactDOM from 'react-dom';
 ```
 
 
-###4. 如何在js|es6|jsx中使用tpl模板
+### 4. 如何在js|es6|jsx中使用tpl模板
 
 * 目前支持.tpl扩展名的模板文件，直接打包到最终的js文件中
 
@@ -278,13 +278,13 @@ import ReactDOM from 'react-dom';
 
 
 
-###5. 如何在HTML/CSS中嵌入base64编码的图片
+### 5. 如何在HTML/CSS中嵌入base64编码的图片
 
 * 只需要图片资源后面添加`?_gm_inline`即可
 * 打包时候会将图片生成`base64`编码替换到到html中
 
 
-#####html
+##### html
 
 ```html
 <p class="play"> 
@@ -292,7 +292,7 @@ import ReactDOM from 'react-dom';
 </p>
 ```
 
-#####CSS/SCSS
+##### CSS/SCSS
 
 ```css
 
@@ -301,7 +301,7 @@ import ReactDOM from 'react-dom';
 }
 ```
 
-###6. 如何在HTML中嵌入内联CSS/JS
+### 6. 如何在HTML中嵌入内联CSS/JS
 
 * 类似图片base64,只需要资源后面添加`?_gm_inline`即可
 
@@ -314,7 +314,7 @@ import ReactDOM from 'react-dom';
 * 注：所有内嵌嵌入的资源，包括图片/JS/CSS，在develop(监视)模式下，都已自动关联更新。即如果a.html文件中，内联嵌入了一个b.css，如果b.css发生了修改，那么a.html会自动编译更新。
 
 
-###7. 如何使用Sprite雪碧图
+### 7. 如何使用Sprite雪碧图
 
 * 基于spritesmith实现，在gulpman.config 中可传入spritesmith配置opts
 * 关于spritesmith详细参见：[https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
@@ -330,7 +330,7 @@ import ReactDOM from 'react-dom';
 }
 ```
 
-###8. 如何使用Usemin
+### 8. 如何使用Usemin
 
 * 整合usemin，在gulpman.config 中可传入usemin的配置opts
 * 关于usemin详细参见：[https://github.com/zont/gulp-usemin](https://github.com/zont/gulp-usemin)
@@ -352,7 +352,7 @@ import ReactDOM from 'react-dom';
 ```
 
 
-###9. 如何使用前端js模板
+### 9. 如何使用前端js模板
 * 支持tpl扩展名，放到components相关目录下即可，js 可以直接require或者import
 * 最终会作为字符串格式打包进js
 * tpl中仍然支持资源嵌入和图片base64等，如参照前面_gm_inline等语法即可
@@ -367,28 +367,28 @@ import ReactDOM from 'react-dom';
     var dialogTpl = require('./dialog.tpl')
 ```
 
-###10. 使用iconfont转换
+### 10. 使用iconfont转换
 * 可以将svg转换成icon-font，用`@font-face`方式引用
 * 初次使用先安装，运行`gulp gm:iconfont:install`
 * 将svg文件放到`components/iconfonts/source`目录下，运行`gulp gm:iconfont`即可
 * 自动生成的icon-font和css文件将会在`iconfonts/gmicon`目录下
 
 
-###11. 支持LAB.js来完成异步加载js
+### 11. 支持LAB.js来完成异步加载js
 * 引入LAB.js到项目中
 * 使用LAB的api来加载即可，使用相对路径
 * 代码用例: `$LAB.script("../testload/test.js").wait(()=>{console.log('test loaded')})`
 
 
 
-###12. Require CSS in js
+### 12. Require CSS in js
 * 直接在js中require你的css文件（源文件时scss文件）
 * The CSS contents will be packaged into js files, and automatically injected to html when page opend. Using style tag
 * 使用时要确保添加 .css 扩展名
 * 举例: `require('./style.css')` or `import style from './style.css'`
 
 
-###13. 如何启用karma单元测试
+### 13. 如何启用karma单元测试
 * 初次使用先安装，运行`gulp gm:karma:install`，会安装依赖和生成`karma.conf.js`文件
 * 在您的components中的对应模块目录下，建立一个spec文件夹，将对应的spec文件放在里面，文件拓展名是.es6
 * 运行 `gulp gm:karma:start` 来启动单元测试(watch模式)，将会运行各spec文件，完成后可在生成的coverage文件夹中查看覆盖率结果
@@ -396,8 +396,8 @@ import ReactDOM from 'react-dom';
 
 
 
-###教程
+### 教程
 [浏览教程链接](http://karat.cc/article/56a351c3e48d2d05682aa0ac "karat.cc")
 
-###License
+### License
 MIT
