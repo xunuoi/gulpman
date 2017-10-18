@@ -252,7 +252,7 @@ gulp gm:compile
 * 比如说，只监视components目录下的home模块：
 
 ```Shell
-
+# this will only watch `components/home` components
 gulp gm:develop -c home
 
 ```

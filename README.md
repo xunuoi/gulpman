@@ -240,12 +240,13 @@ gulp gm:compile
 
 ### 2. Watch one special component in development
 
-* When the project become huge, if we watch all components assets, it will be low efficiency，so we can use gulpman to watch special component to get better performance
+* When the project become huge, if we watch all components assets, it will be slow and low efficiency, so we can only watch special component to get better performance
 
 * Fox example, if we want watch the `home` component:
 
 ```Shell
 
+# this will only watch `components/home` components
 gulp gm:develop -c home
 
 ```
