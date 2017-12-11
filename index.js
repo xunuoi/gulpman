@@ -1,8 +1,6 @@
 /**
  * Gulpman
  * FOR MODULAR FRONT-END SOURCE COMPILE SYSTEM
- * @author Lucas X 
- * xwlxyjk@gmail.com
  */
 
 // =======================================
@@ -42,7 +40,9 @@ let gulp = require('gulp'),
     // css spriter
     spriter = require('./lib/spriter'),
     // fix prefix for revAll and revReplace
-    cdnProxy = require('./lib/cdnProxy')
+    cdnProxy = require('./lib/cdnProxy'),
+
+    specificComponents = '';
 
 
 
@@ -339,7 +339,7 @@ function do_browserify(){
     // 此处如果是tpl发生变化，也会导致重新打包
     // 此处取tmp目录，确保源文件干净没有被browserify过
 
-    var files = globby.sync(j(_opts['runtime_static_tmp'], '**/*.es6')),
+    var files = globby.sync(j(_opts['runtime_static_tmp'], '{' + specificComponents + '}/**/*.es6')),
     tasks = files.map((entry)=>{
         // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
 
@@ -416,7 +416,6 @@ function getRelevancyHandler() {
 
 
 function updateTplFile(tmpFile){
-    // gmutil.alert('tmp: '+tmpFile)
 
     // /Users/cloud/work/karat/k3/assets/.tmp_raw_static/home/dialog.tpl
     
@@ -832,7 +831,8 @@ gulp.task('gm:publish-usemin', ()=>{
 })
 
 
-gulp.task('gm:compile', cb=>{
+gulp.task('gm:compile', cb => {
+    updateAllRawSource();
     return p.sequence(
         'gm:clean', 
         'gm:compile-copy',
@@ -1111,6 +1111,27 @@ gulp.task('gm:update-tpl', ['gm:compile-tpl'], ()=>{
 })
 
 
+function updateAllRawSource() {
+    const componentsList = process.argv.slice(4);
+
+    if (componentsList.length) {
+
+        // should filter the `lib` html files;
+        const htmlList = componentsList.concat(_opts['global'], 'common_html');
+
+        componentsList.push(_opts['global'], _opts['lib'], 'assets');
+
+        specificComponents = componentsList.join();
+
+        all_raw_source = j(_opts['components'], '{' + specificComponents + '}/**/*.{'+all_raw_source_type+'}');
+
+        html_source = [j(_opts['components'],'{' + htmlList.join() + '}/**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')];
+    }
+
+    console.log(all_raw_source);
+}
+
+
 gulp.task('gm:develop', ['gm:compile'], ()=>{
 
     let _cmdBase = {
@@ -1121,13 +1142,12 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
     }
     
     let _how = process.argv[3],
-        _what = process.argv[4]
-
+        _what = process.argv[4];
 
     let _watch_es6_source = es6_source,
         _watch_css_source = sass_source,
         _watch_html_source = html_source,
-        _watch_all_raw_source = all_raw_source
+        _watch_all_raw_source = all_raw_source;
 
 
     if(_how in _cmdBase['component'] && _what){
