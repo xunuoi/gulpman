@@ -215,8 +215,8 @@ gulp gm:init
 # develop and watch mode，watchings files changes and update files
 gulp gm:develop
 
-# Watch one special component
-gulp gm:develop -c component_name
+# Build and Watch one special component, other files are not compiled
+gulp gm:develop -c component_name1,component_name2,component_name3...
 
 
 # publish assets in production env
@@ -246,7 +246,7 @@ gulp gm:compile
 
 ```Shell
 
-# this will only watch `components/home` components
+# this will only build and watch `components/home` components
 gulp gm:develop -c home
 
 ```

@@ -222,8 +222,8 @@ gulp gm:init
 # develop and watch 开发模式，监视相关文件变动，增量更新
 gulp gm:develop
 
-# 指定监视某个component, 提高性能和效率
-gulp gm:develop -c component_name
+# 指定编译和监视某个component, 提高性能和效率（其他文件不编译输出）
+gulp gm:develop -c component_name1,component_name2,component_name3...
 
 
 # publish 发布资源，包括合并、压缩资源、rev产生MD5等

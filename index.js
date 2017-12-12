@@ -42,7 +42,7 @@ let gulp = require('gulp'),
     // fix prefix for revAll and revReplace
     cdnProxy = require('./lib/cdnProxy'),
 
-    specificComponents = '';
+    specificComponents = null;
 
 
 
@@ -334,12 +334,16 @@ function getDirFromTmpStaticToRuntimeStatic(p){
 
 
 // 根据代码的require等，打包js文件
-function do_browserify(){
+function doBrowserify(){
     // 这里不做增量打包，因为js有自身依赖机制，并非单一依赖，需要重新整体打包
     // 此处如果是tpl发生变化，也会导致重新打包
     // 此处取tmp目录，确保源文件干净没有被browserify过
 
-    var files = globby.sync(j(_opts['runtime_static_tmp'], '{' + specificComponents + '}/**/*.es6')),
+    let filesGlob = '';
+    if (specificComponents) {
+        filesGlob = '{' + specificComponents + '}/';
+    }
+    var files = globby.sync(j(_opts['runtime_static_tmp'], filesGlob + '**/*.es6')),
     tasks = files.map((entry)=>{
         // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
 
@@ -404,7 +408,6 @@ function getRelevancyHandler() {
             // the current was changed scss file which is relevancy with the tpl file
             var event = getUpdateEvent()
 
-            // console.log('Evt: ', event)
             updateTplFile(filePath)
 
             event['path'] = filePath
@@ -551,9 +554,7 @@ function compile_sass(singleFile){
     .pipe(p.sourcemaps.init())
     .pipe(p.sass())
     .on('error', function(err){
-        // console.log(err)
         OSInformError('SCSS Compile Error', err, 'Compile Error')
-        // this.end()
         this.emit('end')
     })
     .pipe(p.sourcemaps.write())
@@ -770,7 +771,6 @@ gulp.task('gm:compile-tpl', cb=>{
         // 输出到正式runtime_static
         p.dirname = getDirFromTmpStaticToRuntimeStatic(p)
 
-        // console.log(p)
     }))
     // 输出到正式目录供使用
     .pipe(gulp.dest('./'))
@@ -780,7 +780,6 @@ gulp.task('gm:compile-tpl', cb=>{
     }else {
         // 再输出到dist_static中做备用比如js中可能异步加载？
         return rsB.pipe(p.rename(p=>{
-            // console.log(p)
             // 输出到正式runtime_static
             var diffDir =  path.relative(_opts['runtime_static'], p.dirname),
                 newDirname = j(_opts['dist_static'], diffDir)
@@ -793,7 +792,7 @@ gulp.task('gm:compile-tpl', cb=>{
 
 
 gulp.task('gm:compile-browserify', ['gm:compile-tpl', 'gm:compile-es6'], ()=>{
-    return do_browserify()
+    return doBrowserify()
 })
 
 
@@ -832,7 +831,7 @@ gulp.task('gm:publish-usemin', ()=>{
 
 
 gulp.task('gm:compile', cb => {
-    updateAllRawSource();
+    updateSpecificComponentsSource();
     return p.sequence(
         'gm:clean', 
         'gm:compile-copy',
@@ -841,8 +840,7 @@ gulp.task('gm:compile', cb => {
         'gm:compile-browserify',
         'gm:compile-html'
     )(cb)
-})
-
+});
 
 
 /**
@@ -1059,6 +1057,36 @@ function _checkRelevancy(filePath, event){
     storeCheck(filePath, 'sprite', 'sprite', event)
 }
 
+function getSpecificComponentsList() {
+    if (process.argv[4]) {
+        return process.argv[4].split(',');
+    }
+    return [];
+}
+
+function updateSpecificComponentsSource() {
+    const componentsList = getSpecificComponentsList();
+
+    if (componentsList.length > 0) {
+
+        // should filter the `lib` html files;
+        const htmlList = componentsList.concat(_opts['global']);
+
+        componentsList.unshift( _opts['lib'], _opts['global']);
+
+        specificComponents = componentsList.join();
+
+        all_raw_source = j(_opts['components'], '{' + specificComponents + '}/**/*.{'+all_raw_source_type+'}');
+
+        html_source = [j(_opts['components'],'{' + htmlList.join() + '}/**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')];
+
+        gmutil.warn('\n');
+        gmutil.warn('Components Source: \n -> '+ componentsList.join(', '));
+        gmutil.warn('\n');
+    }
+}
+
+
 
 
 // tasks
@@ -1102,34 +1130,13 @@ gulp.task('gm:update-es6', ()=>{
 
 
 gulp.task('gm:update-js', ['gm:update-es6'], ()=>{
-    return do_browserify()
+    return doBrowserify()
 })
 
 // for browserify and tpl refresh
 gulp.task('gm:update-tpl', ['gm:compile-tpl'], ()=>{
-    return do_browserify()
+    return doBrowserify()
 })
-
-
-function updateAllRawSource() {
-    const componentsList = process.argv.slice(4);
-
-    if (componentsList.length) {
-
-        // should filter the `lib` html files;
-        const htmlList = componentsList.concat(_opts['global'], 'common_html');
-
-        componentsList.push(_opts['global'], _opts['lib'], 'assets');
-
-        specificComponents = componentsList.join();
-
-        all_raw_source = j(_opts['components'], '{' + specificComponents + '}/**/*.{'+all_raw_source_type+'}');
-
-        html_source = [j(_opts['components'],'{' + htmlList.join() + '}/**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')];
-    }
-
-    console.log(all_raw_source);
-}
 
 
 gulp.task('gm:develop', ['gm:compile'], ()=>{
@@ -1141,18 +1148,20 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
         }
     }
     
-    let _how = process.argv[3],
-        _what = process.argv[4];
+    let _how = process.argv[3];
 
     let _watch_es6_source = es6_source,
         _watch_css_source = sass_source,
         _watch_html_source = html_source,
         _watch_all_raw_source = all_raw_source;
 
+    const _specificList = getSpecificComponentsList();
+    const _whatList = [_opts['lib'], _opts['global']].concat(_specificList);
+    const _what = '{' + _whatList.join() + '}';
 
-    if(_how in _cmdBase['component'] && _what){
+    if(_how in _cmdBase['component'] && _specificList.length > 0){
 
-        gmutil.warn('\n*Watch Component: '+_what)
+        gmutil.warn('\n*Watch Component: ' + _what)
         
         _watch_es6_source = j(_opts['components'], _what, '**/*.{es6,jsx}')
         _watch_css_source = j(_opts['components'], _what, '**/*.{scss,sass}')
@@ -1160,7 +1169,6 @@ gulp.task('gm:develop', ['gm:compile'], ()=>{
         _watch_html_source = [j(_opts['components'], _what, '**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')]
 
         _watch_all_raw_source = j(_opts['components'], _what, '**/*.{'+all_raw_source_type+'}')
-
     }
     
 
