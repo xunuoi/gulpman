@@ -311,6 +311,7 @@ import ReactDOM from 'react-dom';
 
 ### 7. Use Sprite img in css
 
+* Enable Sprite by `gulpman.config({ enableCSSSprite: true })`, the default is false.
 * Based on spritesmith, you can transport usemin opts in gulpman.config.
 * More detail about Spritesmith: [https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
 * Usage: In scss file, just add `?_gm_sprite` to img url
