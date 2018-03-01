@@ -1447,7 +1447,7 @@ gulp.task('gm:lib-uglify', ()=>{
  */
 gulp.task('gm:rev-source', ()=>{
 
-    let revAll = new p.revAll({   
+    const revOpts = {   
         // 禁止参与重命名的文件  
         'dontRenameFile': ['.html', /^\/favicon.ico$/],  
         // 无需关联处理文件  
@@ -1457,10 +1457,10 @@ gulp.task('gm:rev-source', ()=>{
 
         // 如果prefix传入的是函数，那么将在rev-all中执行transformPath
         'transformPath': _opts['transformPath']
-    })
+    };
 
     return gulp.src(dist_all_raw_source)
-    .pipe(revAll.revision())
+    .pipe(p.revAll.revision(revOpts))
     /**
      * 这里因为assets_url的缘故，
      * dist_all_raw_source的路径要不带static,
@@ -1468,7 +1468,7 @@ gulp.task('gm:rev-source', ()=>{
      */
     .pipe(gulp.dest(_opts['dist_assets']))
     // 输出manifest文件
-    .pipe(revAll.manifestFile())
+    .pipe(p.revAll.manifestFile())
     .pipe(gulp.dest(_opts['dist_assets']))
 
 })
