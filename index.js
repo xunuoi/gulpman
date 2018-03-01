@@ -42,7 +42,7 @@ let gulp = require('gulp'),
     // fix prefix for revAll and revReplace
     cdnProxy = require('./lib/cdnProxy'),
 
-    specificComponents = null;
+    specificComponents = [];
 
 
 
@@ -72,6 +72,12 @@ let _opts = {
     // library path and global module path
     'lib': 'lib',
     'global': 'global',
+
+    // whether browserify `lib` directory
+    'compileLibFiles': false,
+
+    // enable css-sprite;
+    'enableCSSSprite': false,
 
     // the components source dir
     'components': './components',
@@ -253,9 +259,6 @@ function getB64ImgReg(){
 // browserify 
 function browserified(fpath, sourceDir){
 
-    /*let pathList = _opts['global'].filter(d=>{
-        return j(sourceDir, d)
-    })*/
 
     let _bOpts = {
         entries: fpath,
@@ -340,9 +343,15 @@ function doBrowserify(){
     // 此处取tmp目录，确保源文件干净没有被browserify过
 
     let filesGlob = '';
-    if (specificComponents) {
-        filesGlob = '{' + specificComponents + '}/';
+    if (specificComponents.length > 0) {
+        const browserifyComponentsList = [_opts['global']].concat(specificComponents);
+        // if enable compile `lib` files, then push it to browserify path;
+        if (_opts['compileLibFiles']) {
+            browserifyComponentsList.unshift(_opts['lib']);
+        }
+        filesGlob = '{' + browserifyComponentsList.join() + '}/';
     }
+
     var files = globby.sync(j(_opts['runtime_static_tmp'], filesGlob + '**/*.es6')),
     tasks = files.map((entry)=>{
         // 注意，此处dest目录必须和src目录不一致，否则dest打包后会把输出结果直接输出到src, 那么会影响后续打包的文件，后续打包的文件的require的文件已经不是srcw文件，而是被dest后的文件，因此会有require、define那块额外添加的代码的冗余
@@ -584,6 +593,10 @@ gulp.task('gm:compile-sass', ()=>{
 
 // generate sprite if exist
 gulp.task('gm:compile-css-sprite', ()=>{
+
+    if (!_opts['enableCSSSprite']) {
+        return;
+    }
 
     // here generate sprite into css
     // now sprite all css in runtime_static
@@ -1072,11 +1085,14 @@ function updateSpecificComponentsSource() {
         // should filter the `lib` html files;
         const htmlList = componentsList.concat(_opts['global']);
 
-        componentsList.unshift( _opts['lib'], _opts['global']);
+        specificComponents = [].concat(componentsList);
 
-        specificComponents = componentsList.join();
+        ;
 
-        all_raw_source = j(_opts['components'], '{' + specificComponents + '}/**/*.{'+all_raw_source_type+'}');
+        const sourceComponents = [_opts['lib'], _opts['global']].concat(componentsList).join();
+
+
+        all_raw_source = j(_opts['components'], '{' + sourceComponents + '}/**/*.{'+all_raw_source_type+'}');
 
         html_source = [j(_opts['components'],'{' + htmlList.join() + '}/**/*.html'), '!'+j(_opts['components'], _opts['lib'], '**/*.html')];
 

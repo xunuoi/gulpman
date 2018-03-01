@@ -316,6 +316,7 @@ import ReactDOM from 'react-dom';
 
 ### 7. 如何使用Sprite雪碧图
 
+* 通过配置启用CSS Sprite `gulpman.config({ enableCSSSprite: true })` 默认false不启用
 * 基于spritesmith实现，在gulpman.config 中可传入spritesmith配置opts
 * 关于spritesmith详细参见：[https://github.com/Ensighten/spritesmith](https://github.com/Ensighten/spritesmith)
 * 只需要在scss文件中的图片url资源后面添加`?_gm_sprite`即可
